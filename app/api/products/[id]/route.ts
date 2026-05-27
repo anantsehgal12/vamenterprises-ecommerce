@@ -143,7 +143,7 @@ export async function PUT(
             ? String(mrp)
             : null,
 
-          taxRate: taxRate ? String(taxRate) : "0",
+          taxRate: taxRate ? (String(taxRate) as "0" | "5" | "12" | "18" | "20" | "40") : "0",
 
           description,
 

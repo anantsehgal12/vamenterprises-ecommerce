@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 
 interface Variant {
-  name?: string;
+  name?: string | null;
 }
 
 interface AddToCartFormProps {

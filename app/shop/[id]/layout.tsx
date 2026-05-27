@@ -45,7 +45,7 @@ export async function generateMetadata(
     keywords: [
       product.name,
 
-      product.category.name,
+      ...(product?.category?.name ? [product.category.name] : []),
 
       "VAM Enterprises",
 
