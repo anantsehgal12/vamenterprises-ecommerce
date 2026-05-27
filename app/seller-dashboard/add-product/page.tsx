@@ -136,7 +136,7 @@ export default function AddProductPage() {
 
         const data = await response.json();
 
-        setCategories(data || []);
+        setCategories(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
       }
@@ -701,7 +701,7 @@ export default function AddProductPage() {
                       </SelectTrigger>
 
                       <SelectContent>
-                        {categories.map((category) => (
+                        {Array.isArray(categories) && categories.map((category) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
                           </SelectItem>
