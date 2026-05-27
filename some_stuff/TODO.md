@@ -1,2 +1,0 @@
-- [ ] Create app/_components/ProductGallery.tsx: Implement Shadcn carousel for images, with thumbnails below that scroll to clicked image.
-- [ ] Update app/shop/[id]/page.tsx: Replace current gallery with ProductGallery component.
