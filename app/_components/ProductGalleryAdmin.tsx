@@ -71,25 +71,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         </Carousel>
       </div>
 
-      {/* Thumbnails */}
-      <div className="mt-4 grid grid-cols-4 gap-4">
-        {images.map((image, index) => (
-          <button
-            key={image.id}
-            onClick={() => scrollTo(index)}
-            className={cn(
-              "overflow-hidden rounded-md bg-gray-700 hover:ring-2 focus:outline-none transition-all",
-              current === index ? "ring-2 ring-white" : "hover:ring-white/50"
-            )}
-          >
-            <img
-              src={image.src}
-              alt={image.alt ?? productName}
-              className="h-20 w-full object-cover"
-            />
-          </button>
-        ))}
-      </div>
+      
     </div>
   )
 }

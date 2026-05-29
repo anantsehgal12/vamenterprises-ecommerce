@@ -62,6 +62,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { isAdmin } from "@/app/extras/isAdmis";
 import { createClient } from "@supabase/supabase-js";
+import { ProductGallery } from "@/app/_components/ProductGalleryAdmin";
 
 interface ProductFormData {
   name: string;
@@ -875,12 +876,15 @@ export default function AddProductPage() {
                     <section className="p-4 pb-0">
                       <div className="overflow-hidden rounded-2xl h-80 bg-gradient-to-br from-[#4ca626]/30 to-transparent flex items-center justify-center border border-white/10">
                         {(() => {
-                          const previewImage = formData.images.find(img => img.url);
-                          return previewImage ? (
-                            <img
-                              src={previewImage.url}
-                              alt={previewImage.altText || formData.name}
-                              className="h-full w-full object-cover"
+                          const validImages = formData.images.filter(img => img.url);
+                          return validImages.length > 0 ? (
+                            <ProductGallery 
+                              images={validImages.map((img, index) => ({ 
+                                id: img.storagePath || index, 
+                                src: img.url, 
+                                alt: img.altText || `${formData.name} - Image ${index + 1}` 
+                              }))} 
+                              productName={formData.name} 
                             />
                           ) : (
                             <Package2 className="h-16 w-16 text-[#7ddc56]" />

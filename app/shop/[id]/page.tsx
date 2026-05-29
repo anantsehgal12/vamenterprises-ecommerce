@@ -221,22 +221,15 @@ export default function ProductDetailPage() {
         <div className="grid gap-10 rounded-3xl bg-gradient-to-b from-zinc-900 to-black p-8 shadow-[0_20px_80px_-20px_rgba(76,166,38,0.35)] lg:grid-cols-2 lg:gap-20">
           {/* Gallery */}
           <div className="relative">
-            <div className="absolute inset-0 rounded-[2rem] blur-2xl" />
+            <div className="absolute inset-0 rounded-[2rem] blur-2xl " />
 
-            <div className="relative overflow-hidden rounded-[2rem] p-3 backdrop-blur-xl">
+            <div className="relative overflow-hidden rounded-[2rem] p-3 backdrop-blur-xl flex items-center justify-center h-full w-full">
               <div className="space-y-4">
-                {galleryImages.map((img) => (
-                  <div key={img.id} className="w-full">
-                    <img
-                      src={img.src}
-                      alt={img.alt}
-                      className="w-full aspect-square object-cover rounded-2xl shadow-lg"
-                    />
-                  </div>
-                ))}
+                <ProductGallery images={galleryImages} productName={product.name} />
               </div>
             </div>
           </div>
+          
 
           {/* Product Info */}
           <div className="relative">
