@@ -314,6 +314,17 @@ export const Notification = pgTable("Notification", {
 });
 
 /* =========================================================
+   ANNOUNCEMENTS
+========================================================= */
+
+export const Announcement = pgTable("Announcement", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/* =========================================================
    STORE SETTINGS
 ========================================================= */
 

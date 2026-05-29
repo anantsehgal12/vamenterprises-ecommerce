@@ -27,6 +27,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import RefreshButton from "@/app/_components/RefreshApis";
 
 interface Notification {
   id: string;
@@ -250,6 +251,7 @@ export default function NotificationsPage() {
           <Header />
           <div className="container mx-auto p-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-4 sm:gap-0">
+              <section className="inline-flex items-center gap-4 justify-between w-full">
               <div className="flex gap-5 items-center">
                 <Bell />
                 <h1 className="text-2xl font-bold">Notifications</h1>
@@ -259,6 +261,8 @@ export default function NotificationsPage() {
                   </Badge>
                 )}
               </div>
+              <RefreshButton />
+              </section>
               {unreadCount > 0 && (
                 <Button
                   onClick={markAllAsRead}

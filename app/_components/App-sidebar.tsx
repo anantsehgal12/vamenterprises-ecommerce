@@ -5,6 +5,7 @@ import {
   CirclePlus,
   Home,
   Inbox,
+  Megaphone,
   Package,
   Percent,
   Search,
@@ -70,6 +71,11 @@ const items = [
     title: "Notifications",
     url: "/seller-dashboard/notifications",
     icon: Bell,
+  },
+  {
+    title: "Announcements",
+    url: "/seller-dashboard/announcements",
+    icon: Megaphone,
   },
   {
     title: "Search",

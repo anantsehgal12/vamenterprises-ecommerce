@@ -5,6 +5,7 @@ import About from './_components/About';
 import Footer from './_components/Footer';
 import BottomNav from "./_components/BottomNav";
 import type { Metadata } from "next";
+import Announcements from "./_components/Announcements";
 
 export const metadata: Metadata = {
   title: "Home - VAM Enterprises",
@@ -21,6 +22,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
+        <Announcements />
         <Navbar />
         <Hero />
         <BestSeller />

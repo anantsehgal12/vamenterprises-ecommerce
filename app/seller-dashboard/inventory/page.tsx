@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SidebarProvider, SidebarInset} from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/app/_components/App-sidebar";
 import Header from "@/app/_components/Header";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
 import Navbar from "@/app/_components/Navbar";
 import { isAdmin } from "@/app/extras/isAdmis";
+import RefreshButton from "@/app/_components/RefreshApis";
 
 interface Product {
   id: string;
@@ -139,13 +140,13 @@ export default function InventoryPage() {
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-        <main className="w-full bg-[#0a0a0a] text-white min-h-screen">
-          <Header />
-          <div className="p-6 text-center text-zinc-400">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#4ca626]" />
-            <p className="mt-2">Loading inventory...</p>
-          </div>
-        </main>
+          <main className="w-full bg-[#0a0a0a] text-white min-h-screen">
+            <Header />
+            <div className="p-6 text-center text-zinc-400">
+              <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#4ca626]" />
+              <p className="mt-2">Loading inventory...</p>
+            </div>
+          </main>
         </SidebarInset>
       </SidebarProvider>
     );
@@ -159,10 +160,15 @@ export default function InventoryPage() {
           <main className="w-full bg-[#0a0a0a] text-white min-h-screen">
             <Header />
             <div className="container mx-auto p-6">
-              <div className="flex gap-5 items-center mb-8">
-                <Package className="text-[#7ddc56]" />
-                <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
-              </div>
+              <section className="inline-flex justify-between items-center w-full">
+                <div className="flex gap-5 items-center mb-8">
+                  <Package className="text-[#7ddc56]" />
+                  <h1 className="text-3xl font-bold tracking-tight">
+                    Inventory Management
+                  </h1>
+                </div>
+                <RefreshButton />
+              </section>
 
               <div className="mb-8">
                 <div className="relative">
@@ -268,7 +274,8 @@ export default function InventoryPage() {
                                   >
                                     <DialogTrigger asChild>
                                       <Button
-                                        variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                                        variant="outline"
+                                        className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
                                         size="sm"
                                         onClick={() =>
                                           openStockInDialog(product)
@@ -307,7 +314,8 @@ export default function InventoryPage() {
                                       </div>
                                       <div className="flex justify-end gap-2">
                                         <Button
-                                          variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                                          variant="outline"
+                                          className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
                                           onClick={() => {
                                             setEditingProduct(null);
                                             setStockInOpen(false);
@@ -336,7 +344,8 @@ export default function InventoryPage() {
                                   >
                                     <DialogTrigger asChild>
                                       <Button
-                                        variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                                        variant="outline"
+                                        className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
                                         size="sm"
                                         onClick={() =>
                                           openStockOutDialog(product)
@@ -376,7 +385,8 @@ export default function InventoryPage() {
                                       </div>
                                       <div className="flex justify-end gap-2">
                                         <Button
-                                          variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                                          variant="outline"
+                                          className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
                                           onClick={() => {
                                             setEditingProduct(null);
                                             setStockOutOpen(false);
@@ -393,8 +403,8 @@ export default function InventoryPage() {
                                             )
                                           }
                                         >
-                                        className="bg-red-600 hover:bg-red-700"
-                                          Remove Stock
+                                          className="bg-red-600
+                                          hover:bg-red-700" Remove Stock
                                         </Button>
                                       </div>
                                     </DialogContent>
@@ -490,7 +500,8 @@ export default function InventoryPage() {
                               >
                                 <DialogTrigger asChild>
                                   <Button
-                                    variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f] flex-1"
+                                    variant="outline"
+                                    className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f] flex-1"
                                     size="sm"
                                     onClick={() => openStockInDialog(product)}
                                   >
@@ -527,7 +538,8 @@ export default function InventoryPage() {
                                   </div>
                                   <div className="flex justify-end gap-2">
                                     <Button
-                                      variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                                      variant="outline"
+                                      className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
                                       onClick={() => {
                                         setEditingProduct(null);
                                         setStockInOpen(false);
@@ -556,7 +568,8 @@ export default function InventoryPage() {
                               >
                                 <DialogTrigger asChild>
                                   <Button
-                                    variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f] flex-1"
+                                    variant="outline"
+                                    className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f] flex-1"
                                     size="sm"
                                     onClick={() => openStockOutDialog(product)}
                                   >
@@ -594,7 +607,8 @@ export default function InventoryPage() {
                                   </div>
                                   <div className="flex justify-end gap-2">
                                     <Button
-                                      variant="outline" className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                                      variant="outline"
+                                      className="border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
                                       onClick={() => {
                                         setEditingProduct(null);
                                         setStockOutOpen(false);

@@ -23,6 +23,7 @@ export default function Header() {
     "/seller-dashboard/notifications": "Notifications",
     "/seller-dashboard/settings": "Settings",
     "/seller-dashboard/edit-product": "Edit Product",
+    "/seller-dashboard/announcements": "Announcements",
     // Add more paths and titles as needed
   };
 

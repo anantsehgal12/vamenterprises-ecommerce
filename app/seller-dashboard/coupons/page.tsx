@@ -46,6 +46,7 @@ import { isAdmin } from "@/app/extras/isAdmis";
 import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
 import Navbar from "@/app/_components/Navbar";
+import RefreshButton from "@/app/_components/RefreshApis";
 
 interface Coupon {
   id: string;
@@ -105,7 +106,10 @@ export default function CouponsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          value: formData.discountType === "FREE_SHIPPING" ? 0 : parseFloat(formData.value),
+          value:
+            formData.discountType === "FREE_SHIPPING"
+              ? 0
+              : parseFloat(formData.value),
           usageLimit: formData.usageLimit
             ? parseInt(formData.usageLimit)
             : null,
@@ -162,7 +166,7 @@ export default function CouponsPage() {
 
   const formatDiscount = (coupon: Coupon) => {
     if (coupon.discountType === "FREE_SHIPPING") return "Free Delivery";
-    
+
     return coupon.discountType === "PERCENT"
       ? `${coupon.value}%`
       : `₹  ${coupon.value}`;
@@ -213,107 +217,127 @@ export default function CouponsPage() {
                   <Percent />
                   <h1 className="text-3xl font-bold">Coupons</h1>
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button onClick={resetForm} className="bg-[#4ca626] hover:bg-[#5bbd31]">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Coupon
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="p-6">
-                    <DialogHeader>
-                      <DialogTitle>
-                        {editingCoupon ? "Edit Coupon" : "Add New Coupon"}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <form
-                      onSubmit={handleSubmit}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") e.preventDefault();
-                      }}
-                      className="space-y-6"
-                    >
-                      <div className="space-y-2">
-                        <Label htmlFor="code">Coupon Code</Label>
-                        <Input
-                          id="code"
-                          value={formData.code}
-                          onChange={(e) =>
-                            setFormData({ ...formData, code: e.target.value })
-                          }
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="discountType">Discount Type</Label>
-                        <Select
-                          value={formData.discountType}
-                          onValueChange={(value: "PERCENT" | "FIXED" | "FREE_SHIPPING") =>
-                            setFormData({ ...formData, discountType: value })
-                          }
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="PERCENT">Percentage</SelectItem>
-                            <SelectItem value="FIXED">Fixed Amount</SelectItem>
-                            <SelectItem value="FREE_SHIPPING">Free Shipping</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      {formData.discountType !== "FREE_SHIPPING" && (
+                <section className="inline-flex gap-5">
+                  <RefreshButton />
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={resetForm}
+                        className="bg-[#4ca626] hover:bg-[#5bbd31]"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Coupon
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="p-6">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {editingCoupon ? "Edit Coupon" : "Add New Coupon"}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <form
+                        onSubmit={handleSubmit}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") e.preventDefault();
+                        }}
+                        className="space-y-6"
+                      >
                         <div className="space-y-2">
-                          <Label htmlFor="value">Discount Value</Label>
+                          <Label htmlFor="code">Coupon Code</Label>
                           <Input
-                            id="value"
-                            type="number"
-                            step="0.01"
-                            value={formData.value}
+                            id="code"
+                            value={formData.code}
                             onChange={(e) =>
-                              setFormData({ ...formData, value: e.target.value })
+                              setFormData({ ...formData, code: e.target.value })
                             }
                             required
                           />
                         </div>
-                      )}
-                      <div className="space-y-2">
-                        <Label htmlFor="expiryDate">Expiry Date</Label>
-                        <Input
-                          id="expiryDate"
-                          type="date"
-                          value={formData.expiryDate}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              expiryDate: e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="usageLimit">
-                          Usage Limit (optional)
-                        </Label>
-                        <Input
-                          id="usageLimit"
-                          type="number"
-                          value={formData.usageLimit}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              usageLimit: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                      <Button type="submit" className="w-full bg-[#4ca626] hover:bg-[#5bbd31]">
-                        {editingCoupon ? "Update Coupon" : "Create Coupon"}
-                      </Button>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                        <div className="space-y-2">
+                          <Label htmlFor="discountType">Discount Type</Label>
+                          <Select
+                            value={formData.discountType}
+                            onValueChange={(
+                              value: "PERCENT" | "FIXED" | "FREE_SHIPPING",
+                            ) =>
+                              setFormData({ ...formData, discountType: value })
+                            }
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="PERCENT">
+                                Percentage
+                              </SelectItem>
+                              <SelectItem value="FIXED">
+                                Fixed Amount
+                              </SelectItem>
+                              <SelectItem value="FREE_SHIPPING">
+                                Free Shipping
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {formData.discountType !== "FREE_SHIPPING" && (
+                          <div className="space-y-2">
+                            <Label htmlFor="value">Discount Value</Label>
+                            <Input
+                              id="value"
+                              type="number"
+                              step="0.01"
+                              value={formData.value}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  value: e.target.value,
+                                })
+                              }
+                              required
+                            />
+                          </div>
+                        )}
+                        <div className="space-y-2">
+                          <Label htmlFor="expiryDate">Expiry Date</Label>
+                          <Input
+                            id="expiryDate"
+                            type="date"
+                            value={formData.expiryDate}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                expiryDate: e.target.value,
+                              })
+                            }
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="usageLimit">
+                            Usage Limit (optional)
+                          </Label>
+                          <Input
+                            id="usageLimit"
+                            type="number"
+                            value={formData.usageLimit}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                usageLimit: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <Button
+                          type="submit"
+                          className="w-full bg-[#4ca626] hover:bg-[#5bbd31]"
+                        >
+                          {editingCoupon ? "Update Coupon" : "Create Coupon"}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </section>
               </div>
 
               {error && (
@@ -325,7 +349,10 @@ export default function CouponsPage() {
               {coupons.length === 0 ? (
                 <div className="text-center">
                   <p className="text-gray-500 mb-4">No coupons found.</p>
-                  <Button onClick={() => setIsDialogOpen(true)} className="bg-[#4ca626] hover:bg-[#5bbd31]">
+                  <Button
+                    onClick={() => setIsDialogOpen(true)}
+                    className="bg-[#4ca626] hover:bg-[#5bbd31]"
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Your First Coupon
                   </Button>
@@ -356,8 +383,8 @@ export default function CouponsPage() {
                             </TableCell>
                             <TableCell>
                               <Badge
-                              className="bg-[#4ca626]/10 text-[#7ddc56] border-[#4ca626]/20"                                
-                              variant={
+                                className="bg-[#4ca626]/10 text-[#7ddc56] border-[#4ca626]/20"
+                                variant={
                                   coupon.isActive ? "default" : "secondary"
                                 }
                               >

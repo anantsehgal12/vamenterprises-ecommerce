@@ -21,6 +21,7 @@ import { Search, ShoppingCart } from "lucide-react";
 import { isAdmin } from "@/app/extras/isAdmis";
 import { notFound } from "next/navigation";
 import Navbar from "@/app/_components/Navbar";
+import RefreshButton from "@/app/_components/RefreshApis";
 
 interface OrderItem {
   id: string;
@@ -195,10 +196,13 @@ export default function SellerOrdersPage() {
             <Header />
             <div className="container mx-auto p-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+                <section className="inline-flex items-center gap-4 justify-between w-full">
                 <div className="flex gap-5 items-center">
                   <ShoppingCart className="text-[#7ddc56]"/>
                   <h1 className="text-3xl font-bold tracking-tight">All Orders</h1>
                 </div>
+                <RefreshButton />
+                </section>
                 <div className="flex items-center gap-4 mt-4 sm:mt-0">
                   <Select value={filterStatus} onValueChange={setFilterStatus} >
                     <SelectTrigger className="w-40 bg-[#181818] border-white/10 rounded-xl h-11">

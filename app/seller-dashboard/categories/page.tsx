@@ -41,6 +41,7 @@ import { isAdmin } from "@/app/extras/isAdmis";
 import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
 import Navbar from "@/app/_components/Navbar";
+import RefreshButton from "@/app/_components/RefreshApis";
 
 interface Category {
   id: string;
@@ -193,42 +194,47 @@ export default function CategoriesPage() {
                   <Tag />
                   <h1 className="text-xl font-bold md:text-3xl">Categories</h1>
                 </div>
-                <Dialog
-                  open={isAddDialogOpen}
-                  onOpenChange={setIsAddDialogOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button className="bg-[#4ca626] hover:bg-[#5bbd31]">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Category
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Category</DialogTitle>
-                      <DialogDescription>
-                        Enter the name for the new category.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
-                          Name
-                        </Label>
-                        <Input
-                          id="name"
-                          value={newCategoryName}
-                          onChange={(e) => setNewCategoryName(e.target.value)}
-                          className="col-span-3"
-                          placeholder="Enter category name"
-                        />
+                <section className="inline-flex gap-5">
+                  <RefreshButton />
+                  <Dialog
+                    open={isAddDialogOpen}
+                    onOpenChange={setIsAddDialogOpen}
+                  >
+                    <DialogTrigger asChild>
+                      <Button className="bg-[#4ca626] hover:bg-[#5bbd31]">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Category
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Category</DialogTitle>
+                        <DialogDescription>
+                          Enter the name for the new category.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="name" className="text-right">
+                            Name
+                          </Label>
+                          <Input
+                            id="name"
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            className="col-span-3"
+                            placeholder="Enter category name"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <DialogFooter>
-                      <Button onClick={handleAddCategory}>Add Category</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                      <DialogFooter>
+                        <Button onClick={handleAddCategory}>
+                          Add Category
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </section>
               </div>
 
               <div className="mb-6">
@@ -255,7 +261,10 @@ export default function CategoriesPage() {
                   <CardContent className="p-6">
                     <div className="text-center">
                       <p className="text-gray-500 mb-4">No categories found.</p>
-                      <Button onClick={() => setIsAddDialogOpen(true)} className="bg-[#4ca626] hover:bg-[#5bbd31]">
+                      <Button
+                        onClick={() => setIsAddDialogOpen(true)}
+                        className="bg-[#4ca626] hover:bg-[#5bbd31]"
+                      >
                         <Plus className="h-4 w-4 mr-2" />
                         Add Your First Category
                       </Button>
@@ -354,7 +363,10 @@ export default function CategoriesPage() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button onClick={handleEditCategory} className="bg-[#4ca626] hover:bg-[#5bbd31]">
+                    <Button
+                      onClick={handleEditCategory}
+                      className="bg-[#4ca626] hover:bg-[#5bbd31]"
+                    >
                       Update Category
                     </Button>
                   </DialogFooter>

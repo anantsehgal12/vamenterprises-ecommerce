@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { isAdmin } from "@/app/extras/isAdmis";
 import { Loader2, Settings } from "lucide-react";
+import RefreshButton from "@/app/_components/RefreshApis";
 
 interface NotificationData {
   emailOrders: boolean;
@@ -161,15 +162,18 @@ export default function SettingsPage() {
         <main className="w-full">
           <Header />
           <div className="container mx-auto p-6">
-            <div className="flex gap-5 items-center mb-12">
-              <Settings />
-              <h1 className="text-3xl font-bold">Settings</h1>
-            </div>
+              <div className="flex gap-5 items-center mb-12">
+                <Settings />
+                <h1 className="text-3xl font-bold">Settings</h1>
+              </div>
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-3xl font-bold text-center">
-                  Settings
-                </CardTitle>
+                <section className="inline-flex items-center gap-4 mb-8 w-full justify-between">
+                  <CardTitle className="text-3xl font-bold">
+                    Settings
+                  </CardTitle>
+                  <RefreshButton />
+                </section>
               </CardHeader>
               <CardContent>
                 {error && (
