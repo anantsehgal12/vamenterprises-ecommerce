@@ -190,7 +190,7 @@ export default function ProductDetailPage() {
         <div className="absolute bottom-0 right-[-10%] h-[500px] w-[500px] rounded-full bg-[#4ca626]/10 blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-2 pb-20 pt-8 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-10">
           <ol className="flex flex-wrap items-center gap-3 text-sm text-zinc-400">
@@ -218,7 +218,7 @@ export default function ProductDetailPage() {
         </nav>
 
         {/* Main Section */}
-        <div className="grid gap-10 rounded-3xl bg-gradient-to-b from-zinc-900 to-black p-8 shadow-[0_20px_80px_-20px_rgba(76,166,38,0.35)] lg:grid-cols-2 lg:gap-20">
+        <div className="grid gap-10 rounded-3xl bg-gradient-to-b from-zinc-900 to-black p-4 shadow-[0_20px_80px_-20px_rgba(76,166,38,0.35)] lg:grid-cols-2 lg:gap-20">
           {/* Gallery */}
           <div className="relative">
             <div className="absolute inset-0 rounded-[2rem] blur-2xl " />
