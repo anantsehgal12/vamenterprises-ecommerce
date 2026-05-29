@@ -105,7 +105,7 @@ export default function ShopPage() {
     <main className="min-h-screen bg-black">
       <Navbar />
 
-      <div className="mx-20 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-2 px-4 py-6 sm:px-6 lg:px-8 xl:mx-20">
         {/* Header */}
         <div className="mb-10 flex flex-col items-center justify-center text-center">
           <div className="mb-4 inline-flex items-center rounded-full border border-[#4ca626]/30 bg-[#4ca626]/10 px-4 py-1 text-sm font-medium text-[#9be274] backdrop-blur-md">
@@ -133,7 +133,7 @@ export default function ShopPage() {
         </div>
 
         {/* Products */}
-        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products
             .filter(
               (product) =>
@@ -162,14 +162,14 @@ export default function ShopPage() {
                   href={`/shop/${product.id}`}
                   className="group block h-full"
                 >
-                  <div className="relative h-full overflow-hidden rounded-[30px] border border-white/10 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black transition-all duration-500 hover:-translate-y-2 hover:border-[#4ca626]/50 hover:shadow-[0_20px_70px_-15px_rgba(76,166,38,0.45)]">
+                  <div className="relative h-full overflow-hidden  border border-white/10 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black transition-all duration-500 hover:-translate-y-2 hover:border-[#4ca626]/50 hover:shadow-[0_20px_70px_-15px_rgba(76,166,38,0.45)] rounded-2xl lg:rounded-[30px] xl:rounded-[30px]">
                     {/* Glow */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#4ca626]/15 via-transparent to-[#78d64f]/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
                     {/* Image */}
                     <div className="relative overflow-hidden">
                       {imageUrl ? (
-                        <div className="relative h-72 w-full overflow-hidden">
+                        <div className="relative aspect-square w-full overflow-hidden">
                           <img
                             src={imageUrl}
                             alt={
@@ -183,7 +183,7 @@ export default function ShopPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
                         </div>
                       ) : (
-                        <div className="flex h-72 items-center justify-center bg-zinc-900 text-zinc-500">
+                        <div className="flex aspect-square items-center justify-center bg-zinc-900 text-zinc-500">
                           No Image
                         </div>
                       )}
@@ -197,14 +197,14 @@ export default function ShopPage() {
                     </div>
 
                     {/* Content */}
-                    <div className="relative z-10 flex h-[230px] flex-col justify-between p-5">
+                    <div className="relative z-10 flex h-[200px] flex-col justify-between p-5">
                       <div>
                         <div className="mb-3 flex items-start justify-between gap-3">
                           <h3 className="line-clamp-1 text-lg font-bold tracking-tight text-white">
                             {product.name}
                           </h3>
 
-                          <div className="rounded-full border border-[#4ca626]/20 bg-[#4ca626]/15 px-3 py-1 text-xs font-semibold text-[#9be274]">
+                          <div className="rounded-full text-center border border-[#4ca626]/20 bg-[#4ca626]/15 px-3 py-1 text-xs font-semibold text-[#9be274]">
                             In Stock
                           </div>
                         </div>
@@ -217,7 +217,7 @@ export default function ShopPage() {
                       </div>
 
                       {/* Bottom */}
-                      <div className="mt-6 flex items-end justify-between">
+                      <div className="mt-2 flex items-end justify-between">
                         <div>
                           {product.mrp && (
                             <p className="mb-1 text-sm uppercase tracking-wider text-zinc-500 line-through">

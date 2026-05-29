@@ -545,7 +545,7 @@ export default function CartPage() {
                           <CardContent className="p-5">
                             <div className="flex flex-col gap-5 md:flex-row md:items-center">
                               {/* Image */}
-                              <div className="relative h-44 w-full overflow-hidden rounded-2xl bg-zinc-900 md:h-28 md:w-28">
+                              <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-zinc-900 md:h-28 md:w-28">
                                 {image ? (
                                   <img
                                     src={

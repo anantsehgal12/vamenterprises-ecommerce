@@ -91,7 +91,7 @@ function BestSeller() {
                         {/* Image */}
                         <div className="relative overflow-hidden">
                           {product.images && product.images.length > 0 ? (
-                            <div className="relative h-60 w-full overflow-hidden">
+                            <div className="relative aspect-square w-full overflow-hidden">
                               <img
                                 src={product.images[0].url}
                                 alt={product.images[0].altText || product.name}
@@ -102,7 +102,7 @@ function BestSeller() {
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
                             </div>
                           ) : (
-                            <div className="flex h-60 items-center justify-center bg-zinc-900 text-zinc-500">
+                            <div className="flex aspect-square items-center justify-center bg-zinc-900 text-zinc-500">
                               No Image
                             </div>
                           )}
