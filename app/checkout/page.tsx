@@ -24,6 +24,7 @@ import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { Info, ChevronDown, Edit } from "lucide-react";
 import Image from "next/image";
+import BottomNav from "../_components/BottomNav";
 
 declare global {
   interface Window {
@@ -1358,6 +1359,7 @@ export default function CheckoutPage() {
           )}
         </div>
       </div>
+      <BottomNav  />
     </div>
   );
 }

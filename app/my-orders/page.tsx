@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import BottomNav from '../_components/BottomNav';
 
 interface OrderItem {
   id: string;
@@ -320,6 +321,7 @@ export default function OrdersPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      <BottomNav />
       </div>
   );
 }

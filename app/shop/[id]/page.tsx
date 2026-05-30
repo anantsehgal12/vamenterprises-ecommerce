@@ -9,6 +9,7 @@ import AddToCartForm from "@/app/_components/AddToCartForm";
 import { ProductGallery } from "@/app/_components/ProductGallery";
 import YouMayAlsoLike from "@/app/_components/YouMayAlsoLike";
 import Footer from "@/app/_components/Footer";
+import BottomNav from "@/app/_components/BottomNav";
 
 interface ProductImage {
   id: string;
@@ -335,6 +336,7 @@ export default function ProductDetailPage() {
       </div>
 
       <Footer />
+      <BottomNav />
     </div>
   );
 }

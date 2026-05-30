@@ -8,6 +8,7 @@ import SearchBar from "../_components/SearchBar";
 import Footer from "../_components/Footer";
 
 import { Separator } from "@/components/ui/separator";
+import BottomNav from "../_components/BottomNav";
 
 interface Product {
   id: string;
@@ -291,6 +292,7 @@ export default function ShopPage() {
       </div>
 
       <Footer />
+      <BottomNav />
     </main>
   );
 }

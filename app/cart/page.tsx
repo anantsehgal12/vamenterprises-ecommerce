@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/card';
 
 import { Input } from '@/components/ui/input';
+import BottomNav from '../_components/BottomNav';
 
 interface ImageType {
   id: string;
@@ -841,6 +842,7 @@ export default function CartPage() {
           </div>
         )}
       </div>
+      <BottomNav />
     </div>
   );
 }

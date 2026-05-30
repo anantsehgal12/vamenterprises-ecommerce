@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from "react-hot-toast";
 import { Loader2, Download, Eye } from 'lucide-react';
+import BottomNav from '@/app/_components/BottomNav';
 
 interface OrderItem {
   id: string;
@@ -504,6 +505,7 @@ export default function OrderCompletePage() {
           </div>
         </div>
       </div>
+      <BottomNav />
     </main>
   );
 }

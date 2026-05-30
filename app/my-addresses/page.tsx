@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "react-hot-toast";
 import { MapPin, Plus, Edit, Trash2, Star } from "lucide-react";
+import BottomNav from "../_components/BottomNav";
 
 interface Address {
   id: string;
@@ -614,6 +615,7 @@ export default function MyAddressesPage() {
             )}
           </div>
         </div>
+        <BottomNav />
       </div>
   );
 }
