@@ -78,6 +78,11 @@ const items = [
     icon: Megaphone,
   },
   {
+    title: "Create Order [POS]",
+    url: "/seller-dashboard/create-order",
+    icon: ShoppingCart,
+  },
+  {
     title: "Search",
     url: "/seller-dashboard/search",
     icon: Search,

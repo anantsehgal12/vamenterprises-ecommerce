@@ -182,6 +182,10 @@ export const Order = pgTable("Order", {
     .default("pending")
     .notNull(),
 
+  paymentMethod: varchar("payment_method", { length: 50 })
+    .default("Razorpay")
+    .notNull(),
+
   address: jsonb("address").$type<{
     fullName: string;
     phone: string;

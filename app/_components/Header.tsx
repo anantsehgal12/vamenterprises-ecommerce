@@ -24,6 +24,7 @@ export default function Header() {
     "/seller-dashboard/settings": "Settings",
     "/seller-dashboard/edit-product": "Edit Product",
     "/seller-dashboard/announcements": "Announcements",
+    "/seller-dashboard/create-order": "Create Order [POS]",
     // Add more paths and titles as needed
   };
 

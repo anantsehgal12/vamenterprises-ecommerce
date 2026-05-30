@@ -265,7 +265,7 @@ export default function SellerOrdersPage() {
                                 {new Date(order.createdAt).toLocaleString()}
                               </p>
                               <p className="text-zinc-400 text-sm">
-                            User ID: {order.userId}
+                            User ID: {order.userId || "Walk-in/Guest"}
                               </p>
                             </div>
                             <div className="text-right">
@@ -390,7 +390,7 @@ export default function SellerOrdersPage() {
                                 {new Date(order.createdAt).toLocaleDateString()}
                               </p>
                               <p className="text-xs text-zinc-400">
-                            User ID: {order.userId.slice(0, 12)}...
+                            User ID: {order.userId ? `${order.userId.slice(0, 12)}...` : "Walk-in/Guest"}
                               </p>
                             </div>
                             <div className="text-right">
