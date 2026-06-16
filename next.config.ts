@@ -1,6 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [{ loader: '@svgr/webpack', options: { icon: true } }],
+    });
+    return config;
+  },
+  turbopack: {
+    rules: {
+      // Match all SVG files and pipe them through SVGR
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
+      },
+    },
+  },
   /* config options here */
    eslint: { ignoreDuringBuilds: true },
    experimental: {

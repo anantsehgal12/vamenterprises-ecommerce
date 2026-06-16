@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/app/_components/App-sidebar";
-import Header from "@/app/_components/Header";
+import { AppSidebar } from "@/app/_components/admin/App-sidebar";
+import Header from "@/app/_components/admin/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +27,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import RefreshButton from "@/app/_components/RefreshApis";
+import RefreshButton from "@/app/_components/admin/RefreshApis";
 
 interface Notification {
   id: string;

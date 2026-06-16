@@ -1,6 +1,6 @@
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Metadata } from "next";
-import ContMenu from "../_components/Context-Menu";
+import ContMenu from "../_components/admin/Context-Menu";
 
 export const metadata: Metadata = {
   title: "Seller Dashboard - VAM Enterprises",

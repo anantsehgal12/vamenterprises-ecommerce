@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
-import Navbar from "../_components/Navbar";
-import Footer from "../_components/Footer";
-import Header from "../_components/Header";
+import Navbar from "../_components/home/Navbar";
+import Footer from "../_components/home/Footer";
+import Header from "../_components/admin/Header";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "../_components/App-sidebar";
+import { AppSidebar } from "../_components/admin/App-sidebar";
 import { Home, TrendingUp, PieChart, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";

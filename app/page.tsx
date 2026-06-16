@@ -1,11 +1,11 @@
-import Hero from "./_components/Hero";
-import Navbar from "./_components/Navbar";
-import BestSeller from './_components/BestSeller';
-import About from './_components/About';
-import Footer from './_components/Footer';
-import BottomNav from "./_components/BottomNav";
+import Hero from "./_components/home/Hero";
+import Navbar from "./_components/home/Navbar";
+import BestSeller from './_components/home/BestSeller';
+import About from './_components/home/About';
+import Footer from './_components/home/Footer';
+import BottomNav from "./_components/home/BottomNav";
 import type { Metadata } from "next";
-import Announcements from "./_components/Announcements";
+import Announcements from "./_components/home/Announcements";
 
 export const metadata: Metadata = {
   title: "Home - VAM Enterprises",

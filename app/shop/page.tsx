@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import Navbar from "../_components/Navbar";
-import SearchBar from "../_components/SearchBar";
-import Footer from "../_components/Footer";
+import Navbar from "../_components/home/Navbar";
+import SearchBar from "../_components/home/SearchBar";
+import Footer from "../_components/home/Footer";
 
 import { Separator } from "@/components/ui/separator";
-import BottomNav from "../_components/BottomNav";
+import BottomNav from "../_components/home/BottomNav";
 
 interface Product {
   id: string;

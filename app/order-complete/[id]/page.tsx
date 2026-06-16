@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
-import Navbar from '@/app/_components/Navbar';
+import Navbar from '@/app/_components/home/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,8 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from "react-hot-toast";
 import { Loader2, Download, Eye } from 'lucide-react';
-import BottomNav from '@/app/_components/BottomNav';
-import ShiprocketTrackingDisplay from '@/app/_components/ShiprocketTrackingDisplay';
+import BottomNav from '@/app/_components/home/BottomNav';
+import ShiprocketTrackingDisplay from '@/app/_components/admin/ShiprocketTrackingDisplay';
 
 interface OrderItem {
   id: string;
@@ -423,7 +423,7 @@ export default function OrderCompletePage() {
             </CardContent>
           </Card>
 
-          <div className="flex justify-center space-x-4 mt-8">
+          <div className="flex flex-col mx-10 gap-8 justify-center space-x-4 mt-8 mb-20 xl:flex-row lg:flex-row">
             {!['shipped', 'delivered', 'cancelled'].includes(order.status.toLowerCase()) && (
               <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
                 <DialogTrigger asChild>

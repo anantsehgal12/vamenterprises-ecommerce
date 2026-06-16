@@ -2,10 +2,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
-  SignedIn,
-  SignedOut,
+  Show,
   UserButton,
-  useClerk,
   useUser,
 } from "@clerk/nextjs";
 import Image from "next/image";
@@ -24,8 +22,6 @@ import {isAdmin} from "@/app/extras/isAdmis";
 function Navbar() {
   const user = useUser();
   const User = user.user;
-  const { openSignIn } = useClerk();
-  const { openSignUp } = useClerk();
   const [cartItemCount, setCartItemCount] = useState(0);
 
 
@@ -86,19 +82,23 @@ function Navbar() {
             </ul>
           </div>
           <div className="flex gap-2 md:gap-4">
-            <SignedOut>
-              <Button className="rounded-2xl text-sm md:text-base" onClick={() => openSignIn()}>
-                Sign In
+            <Show when="signed-out">
+              <Button className="rounded-2xl text-sm md:text-base">
+                 <Link href="/auth/sign-in">
+                  Sign In
+                </Link>
               </Button>
               <Button
                 variant="outline"
                 className="rounded-2xl text-sm md:text-base"
-                onClick={() => openSignUp()}
+                asChild
               >
-                Sign Up
+                <Link href="/auth/sign-up">
+                  Sign Up
+                </Link>
               </Button>
-            </SignedOut>
-            <SignedIn>
+            </Show>
+            <Show when="signed-in">
               <h1 className="text-sm md:text-base">Hi, {User?.firstName} !</h1>
               <UserButton>
                 <UserButton.MenuItems>
@@ -119,7 +119,7 @@ function Navbar() {
                   />
                 </UserButton.MenuItems>
               </UserButton>
-            </SignedIn>
+            </Show>
           </div>
         </header>
     </main>

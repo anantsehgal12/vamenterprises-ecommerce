@@ -7,8 +7,8 @@ import {
   Clock3,
 } from "lucide-react";
 
-import Navbar from "@/app/_components/Navbar";
-import Footer from "@/app/_components/Footer";
+import Navbar from "@/app/_components/home/Navbar";
+import Footer from "@/app/_components/home/Footer";
 
 export default function AboutPage() {
   return (

@@ -6,8 +6,8 @@ import { useRouter, useParams } from "next/navigation";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import { AppSidebar } from "@/app/_components/App-sidebar";
-import Header from "@/app/_components/Header";
+import { AppSidebar } from "@/app/_components/admin/App-sidebar";
+import Header from "@/app/_components/admin/Header";
 
 import { Button } from "@/components/ui/button";
 
@@ -50,7 +50,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ShiprocketTrackingDisplay from "@/app/_components/ShiprocketTrackingDisplay";
+import ShiprocketTrackingDisplay from "@/app/_components/admin/ShiprocketTrackingDisplay";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";

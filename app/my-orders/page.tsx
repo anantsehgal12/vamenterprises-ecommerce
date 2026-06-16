@@ -3,15 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/app/_components/Navbar';
+import Navbar from '@/app/_components/home/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import BottomNav from '../_components/BottomNav';
-import ShiprocketTrackingDisplay from '@/app/_components/ShiprocketTrackingDisplay';
+import BottomNav from '../_components/home/BottomNav';
+import ShiprocketTrackingDisplay from '@/app/_components/admin/ShiprocketTrackingDisplay';
 
 interface OrderItem {
   id: string;
@@ -236,7 +236,7 @@ export default function OrdersPage() {
                         ))}
                       </div>
                       <div className="mt-4 pt-4 border-t border-white/10">
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col gap-8 justify-between items-center">
                           <div className="flex space-x-2">
                             <Button
                               onClick={() => router.push(`/order-complete/${order.id}`)}

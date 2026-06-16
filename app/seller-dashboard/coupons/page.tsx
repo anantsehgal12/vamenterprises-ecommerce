@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/app/_components/App-sidebar";
-import Header from "@/app/_components/Header";
+import { AppSidebar } from "@/app/_components/admin/App-sidebar";
+import Header from "@/app/_components/admin/Header";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,8 +45,8 @@ import { Plus, Edit, Trash2, Percent } from "lucide-react";
 import { isAdmin } from "@/app/extras/isAdmis";
 import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
-import Navbar from "@/app/_components/Navbar";
-import RefreshButton from "@/app/_components/RefreshApis";
+import Navbar from "@/app/_components/home/Navbar";
+import RefreshButton from "@/app/_components/admin/RefreshApis";
 
 interface Coupon {
   id: string;

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/app/_components/App-sidebar";
-import Header from "@/app/_components/Header";
+import { AppSidebar } from "@/app/_components/admin/App-sidebar";
+import Header from "@/app/_components/admin/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -49,7 +49,7 @@ import { isAdmin } from "@/app/extras/isAdmis";
 import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import { ProductGallery } from "@/app/_components/ProductGalleryAdmin";
+import { ProductGallery } from "@/app/_components/admin/ProductGalleryAdmin";
 
 interface ProductFormData {
   name: string;
@@ -98,6 +98,7 @@ export default function EditProductPage() {
     finalPrice: "0",
     discount: "0",
   });
+  const [isPriceWithTax, setIsPriceWithTax] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -143,14 +144,23 @@ export default function EditProductPage() {
     const price = parseFloat(formData.price) || 0;
     const mrp = parseFloat(formData.mrp) || 0;
     const taxRate = parseFloat(formData.taxRate) || 0;
-    const taxAmount = (price * taxRate) / 100;
-    const finalPrice = price + taxAmount;
+    let finalPrice = 0;
+    if (isPriceWithTax) {
+      finalPrice = price;
+    } else {
+      const taxAmount = (price * taxRate) / 100;
+      finalPrice = price + taxAmount;
+    }
     const discount = mrp > 0 ? (((mrp - finalPrice) / mrp) * 100).toFixed(2) : "0";
     setCalculatedFields({
       finalPrice: Math.round(finalPrice).toString(),
       discount,
     });
-  }, [formData.price, formData.mrp, formData.taxRate]);
+  }, [formData.price, formData.mrp, formData.taxRate, isPriceWithTax]);
+
+  const handleTaxToggle = (checked: boolean) => {
+    setIsPriceWithTax(checked);
+  };
 
   const fetchProduct = async () => {
     try {
@@ -205,6 +215,10 @@ export default function EditProductPage() {
     setError("");
 
     try {
+      const submittedPrice = isPriceWithTax
+        ? (parseFloat(formData.price) / (1 + parseFloat(formData.taxRate || "0") / 100)).toFixed(2)
+        : formData.price;
+
       const response = await fetch(`/api/products/${productId}`, {
         method: "PUT",
         headers: {
@@ -212,7 +226,7 @@ export default function EditProductPage() {
         },
         body: JSON.stringify({
           ...formData,
-
+          price: submittedPrice,
           mrp: parseFloat(formData.mrp) || null,
         }),
       });
@@ -555,9 +569,18 @@ export default function EditProductPage() {
                       </div>
 
                       <div>
-                        <Label className="mb-3 block text-zinc-300">
-                          Selling Price
-                        </Label>
+                        <div className="flex items-center justify-between mb-3">
+                          <Label className="block text-zinc-300">
+                            Selling Price
+                          </Label>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-zinc-400">With Tax</Label>
+                            <Switch
+                              checked={isPriceWithTax}
+                              onCheckedChange={handleTaxToggle}
+                            />
+                          </div>
+                        </div>
 
                         <Input
                           value={formData.price}

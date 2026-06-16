@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import Navbar from "@/app/_components/Navbar";
+import Navbar from "@/app/_components/home/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "react-hot-toast";
 import { MapPin, Plus, Edit, Trash2, Star } from "lucide-react";
-import BottomNav from "../_components/BottomNav";
+import BottomNav from "../_components/home/BottomNav";
 
 interface Address {
   id: string;

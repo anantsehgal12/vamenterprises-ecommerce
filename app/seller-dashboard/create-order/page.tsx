@@ -6,8 +6,8 @@ import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/app/_components/App-sidebar";
-import Header from "@/app/_components/Header";
+import { AppSidebar } from "@/app/_components/admin/App-sidebar";
+import Header from "@/app/_components/admin/Header";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

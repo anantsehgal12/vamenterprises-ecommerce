@@ -21,8 +21,8 @@ import { notFound } from "next/navigation";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import { AppSidebar } from "@/app/_components/App-sidebar";
-import Header from "@/app/_components/Header";
+import { AppSidebar } from "@/app/_components/admin/App-sidebar";
+import Header from "@/app/_components/admin/Header";
 
 import { Button } from "@/components/ui/button";
 
@@ -64,7 +64,7 @@ import { Switch } from "@/components/ui/switch";
 
 import { isAdmin } from "@/app/extras/isAdmis";
 import { createClient } from "@supabase/supabase-js";
-import { ProductGallery } from "@/app/_components/ProductGalleryAdmin";
+import { ProductGallery } from "@/app/_components/admin/ProductGalleryAdmin";
 
 interface ProductFormData {
   name: string;
@@ -117,6 +117,8 @@ export default function AddProductPage() {
     finalPrice: "0",
     discount: "0",
   });
+
+  const [isPriceWithTax, setIsPriceWithTax] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -172,9 +174,13 @@ export default function AddProductPage() {
 
     const taxRate = parseFloat(formData.taxRate) || 0;
 
-    const taxAmount = (price * taxRate) / 100;
-
-    const finalPrice = price + taxAmount;
+    let finalPrice = 0;
+    if (isPriceWithTax) {
+      finalPrice = price;
+    } else {
+      const taxAmount = (price * taxRate) / 100;
+      finalPrice = price + taxAmount;
+    }
 
     const discount = mrp > 0 ? (((mrp - finalPrice) / mrp) * 100).toFixed(2) : "0";
 
@@ -182,7 +188,11 @@ export default function AddProductPage() {
       finalPrice: Math.round(finalPrice).toString(),
       discount,
     });
-  }, [formData.price, formData.mrp, formData.taxRate]);
+  }, [formData.price, formData.mrp, formData.taxRate, isPriceWithTax]);
+
+  const handleTaxToggle = (checked: boolean) => {
+    setIsPriceWithTax(checked);
+  };
 
   const missingFields = [];
 
@@ -219,10 +229,14 @@ export default function AddProductPage() {
     setError("");
 
     try {
+      const submittedPrice = isPriceWithTax
+        ? (parseFloat(formData.price) / (1 + parseFloat(formData.taxRate || "0") / 100)).toFixed(2)
+        : formData.price;
+
       const payload = {
         name: formData.name,
 
-        price: formData.price,
+        price: submittedPrice,
 
         mrp: formData.mrp || null,
 
@@ -575,9 +589,18 @@ export default function AddProductPage() {
                       </div>
 
                       <div>
-                        <Label className="mb-3 block text-zinc-300">
-                          Selling Price
-                        </Label>
+                        <div className="flex items-center justify-between mb-3">
+                          <Label className="block text-zinc-300">
+                            Selling Price
+                          </Label>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-zinc-400">With Tax</Label>
+                            <Switch
+                              checked={isPriceWithTax}
+                              onCheckedChange={handleTaxToggle}
+                            />
+                          </div>
+                        </div>
 
                         <Input
                           value={formData.price}
@@ -939,7 +962,7 @@ export default function AddProductPage() {
                           <span className="text-zinc-400">Selling Price</span>
 
                           <span className="text-xl font-bold">
-                            ₹{formData.price || "0"}
+                            ₹{calculatedFields.finalPrice || "0"}
                           </span>
                         </div>
 

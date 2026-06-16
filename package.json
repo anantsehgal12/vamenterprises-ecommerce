@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.33.1",
+    "@clerk/nextjs": "^7.5.2",
     "@clerk/themes": "^2.4.57",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
@@ -77,6 +77,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

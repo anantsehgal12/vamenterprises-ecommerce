@@ -4,12 +4,12 @@ import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import Navbar from "@/app/_components/Navbar";
-import AddToCartForm from "@/app/_components/AddToCartForm";
-import { ProductGallery } from "@/app/_components/ProductGallery";
-import YouMayAlsoLike from "@/app/_components/YouMayAlsoLike";
-import Footer from "@/app/_components/Footer";
-import BottomNav from "@/app/_components/BottomNav";
+import Navbar from "@/app/_components/home/Navbar";
+import AddToCartForm from "@/app/_components/home/AddToCartForm";
+import { ProductGallery } from "@/app/_components/home/ProductGallery";
+import YouMayAlsoLike from "@/app/_components/home/YouMayAlsoLike";
+import Footer from "@/app/_components/home/Footer";
+import BottomNav from "@/app/_components/home/BottomNav";
 
 interface ProductImage {
   id: string;

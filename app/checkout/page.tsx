@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import Navbar from "@/app/_components/Navbar";
+import Navbar from "@/app/_components/home/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,8 +24,8 @@ import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { Info, ChevronDown, Edit } from "lucide-react";
 import Image from "next/image";
-import BottomNav from "../_components/BottomNav";
-import { PaymentMethodSelector } from "../_components/PaymentMethodSelector";
+import BottomNav from "../_components/home/BottomNav";
+import { PaymentMethodSelector } from "../_components/home/PaymentMethodSelector";
 
 declare global {
   interface Window {
@@ -647,6 +647,7 @@ export default function CheckoutPage() {
         prefill: {
           name: user?.firstName + " " + user?.lastName,
           email: user?.primaryEmailAddress?.emailAddress,
+          contact: customerDetails.contactNo,
         },
         theme: {
           color: "#000000",
@@ -1213,7 +1214,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Right side - Summary */}
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 space-y-10">
                 <PaymentMethodSelector 
                   value={paymentMethod} 
                   onChange={setPaymentMethod} 
@@ -1222,7 +1223,7 @@ export default function CheckoutPage() {
                   <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-6">
                     <CardTitle className="text-lg sm:text-xl text-white">Order Summary</CardTitle>
                   </CardHeader>
-                  <CardContent className="p-4 sm:p-6 pt-0 sm:pt-6 space-y-3 sm:space-y-4 overflow-visible">
+                  <CardContent className="p-4 pt-0 sm:p-6 pt-0 sm:pt-6 space-y-3 sm:space-y-4 overflow-visible">
                     {/* Coupon Section */}
                     <div className="space-y-2">
                       <Label

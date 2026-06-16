@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 import Lenis from "lenis";
 import { cn } from "@/lib/utils";
 import localFont from "next/font/local";
-import SmoothScrolling from "./_components/SmoothScrolling";
+import SmoothScrolling from "./_components/home/SmoothScrolling";
 
 
 const geistSans = Geist({

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/app/_components/App-sidebar";
-import Header from "@/app/_components/Header";
+import { AppSidebar } from "@/app/_components/admin/App-sidebar";
+import Header from "@/app/_components/admin/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -40,10 +40,10 @@ import { Switch } from "@/components/ui/switch";
 import { isAdmin } from "@/app/extras/isAdmis";
 import { useUser } from "@clerk/nextjs";
 import { notFound } from "next/navigation";
-import Navbar from "@/app/_components/Navbar";
+import Navbar from "@/app/_components/home/Navbar";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
-import RefreshButton from "@/app/_components/RefreshApis";
+import RefreshButton from "@/app/_components/admin/RefreshApis";
 
 interface Product {
   id: string;

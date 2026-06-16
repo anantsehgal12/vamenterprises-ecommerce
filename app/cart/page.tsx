@@ -11,16 +11,16 @@ import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 
 import { motion } from "framer-motion";
 
-import Navbar from "@/app/_components/Navbar";
+import Navbar from "@/app/_components/home/Navbar";
 
 import { Button } from "@/components/ui/button";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Input } from "@/components/ui/input";
-import BottomNav from "../_components/BottomNav";
-import OptionalCart from "@/app/_components/OptCart";
-import YouMayAlsoLike from "../_components/YouMayAlsoLike";
+import BottomNav from "../_components/home/BottomNav";
+import OptionalCart from "@/app/_components/home/OptCart";
+import YouMayAlsoLike from "../_components/home/YouMayAlsoLike";
 import items from "razorpay/dist/types/items";
 
 interface ImageType {
