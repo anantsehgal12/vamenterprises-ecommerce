@@ -25,6 +25,7 @@ import { motion } from "framer-motion";
 import { Info, ChevronDown, Edit } from "lucide-react";
 import Image from "next/image";
 import BottomNav from "../_components/BottomNav";
+import { PaymentMethodSelector } from "../_components/PaymentMethodSelector";
 
 declare global {
   interface Window {
@@ -147,6 +148,7 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"Razorpay" | "COD">("Razorpay");
 
   useEffect(() => {
     const loadData = async () => {
@@ -549,6 +551,7 @@ export default function CheckoutPage() {
 
     try {
       const totalAmount = calculateTotal();
+      const amountToPay = paymentMethod === "COD" ? totalAmount / 2 : totalAmount;
 
       // Create Razorpay order
       const response = await fetch("/api/payment/create-order", {
@@ -557,7 +560,7 @@ export default function CheckoutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: totalAmount,
+          amount: amountToPay,
           currency: "INR",
         }),
       });
@@ -583,7 +586,7 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: amount,
         currency: currency,
-        name: "Vam Enterprises",
+        name: "VAM Enterprises",
         description: "Purchase from Vam Enteprises",
         order_id: orderId,
         handler: async function (response: any) {
@@ -598,6 +601,8 @@ export default function CheckoutPage() {
                 razorpayOrderId: response.razorpay_order_id,
                 razorpayPaymentId: response.razorpay_payment_id,
                 totalAmount: calculateTotal(),
+                amountPaid: amountToPay,
+                paymentMethod: paymentMethod,
                 customerDetails,
                 appliedCoupon: appliedCoupon
                   ? {
@@ -1209,6 +1214,10 @@ export default function CheckoutPage() {
 
               {/* Right side - Summary */}
               <div className="lg:col-span-1">
+                <PaymentMethodSelector 
+                  value={paymentMethod} 
+                  onChange={setPaymentMethod} 
+                />
                 <Card className="bg-gradient-to-b from-zinc-900 to-black border-white/10 shadow-[0_20px_80px_-20px_rgba(76,166,38,0.2)] backdrop-blur-xl rounded-2xl sm:rounded-[2rem] sticky top-24">
                   <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-6">
                     <CardTitle className="text-lg sm:text-xl text-white">Order Summary</CardTitle>
@@ -1335,6 +1344,12 @@ export default function CheckoutPage() {
                       <span>Total Amount:</span>
                       <span>₹{calculateTotal().toFixed(2)}</span>
                     </div>
+                    {paymentMethod === "COD" && (
+                      <div className="flex justify-between text-base md:text-lg font-bold text-[#9be274]">
+                        <span>Advance to Pay (50%):</span>
+                        <span>₹{(calculateTotal() / 2).toFixed(2)}</span>
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <Button
                         variant="outline"
@@ -1349,7 +1364,7 @@ export default function CheckoutPage() {
                         className="w-full rounded-xl p-4 text-sm md:text-base cursor-pointer h-10 sm:h-12 bg-[#4ca626] text-white hover:bg-[#5cbf32]"
                         disabled={isProcessingPayment}
                       >
-                        {isProcessingPayment ? "Processing..." : "Pay Now"}
+                        {isProcessingPayment ? "Processing..." : paymentMethod === "COD" ? `Pay Advance ₹${(calculateTotal() / 2).toFixed(2)}` : "Pay Now"}
                       </Button>
                     </div>
                   </CardContent>

@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import BottomNav from '../_components/BottomNav';
+import ShiprocketTrackingDisplay from '@/app/_components/ShiprocketTrackingDisplay';
 
 interface OrderItem {
   id: string;
@@ -33,6 +34,8 @@ interface Order {
   status: string;
   razorpayOrderId: string;
   razorpayPaymentId: string;
+  paymentMethod?: string;
+  awb?: string;
   invoiceUrl?: string;
   items: OrderItem[];
   createdAt: string;
@@ -195,6 +198,9 @@ export default function OrdersPage() {
                         <div className="text-right">
                           <p className="text-zinc-400 text-sm">Total Amount</p>
                           <p className="text-white text-xl font-bold">₹{Number(order.totalAmount).toFixed(2)}</p>
+                          {order.paymentMethod && (
+                            <p className="text-zinc-400 text-xs mt-1">Via {order.paymentMethod}</p>
+                          )}
                         </div>
                       </div>
                     </CardHeader>
@@ -259,6 +265,14 @@ export default function OrdersPage() {
                           )}
                         </div>
                       </div>
+                      {order.awb && (
+                        <div className="mt-6 pt-4 border-t border-white/10">
+                          <h4 className="text-white font-semibold mb-4">Shipment Tracking</h4>
+                          <div className="bg-[#181818] p-4 rounded-xl border border-white/5">
+                            <ShiprocketTrackingDisplay awb={order.awb} />
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}

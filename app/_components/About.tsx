@@ -19,7 +19,7 @@ function About() {
             premium one stop gifting solution in retail and bulk.
           </h2>
           <Button className="rounded-3xl bg-[#4ca626] hover:bg-[#5cbf32] p-4 md:p-6 lg:px-20 lg:py-8 text-sm md:text-md" asChild>
-            <Link href="/">Learn More</Link>
+            <Link href="/about">Learn More</Link>
           </Button>
         </div>
       </main>

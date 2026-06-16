@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
         totalAmount: String(totalAmount),
         razorpayOrderId: razorpayOrderId || "MANUAL",
         razorpayPaymentId: razorpayPaymentId || "MANUAL",
-        paymentMethod: paymentMethod || (isManual ? "Cash" : "Razorpay"),
+        paymentMethod: paymentMethod || (isManual ? "COD" : "Razorpay"),
         address: normalizedAddress,
         invoiceUrl: invoiceUrl || null,
       } as typeof Order.$inferInsert)

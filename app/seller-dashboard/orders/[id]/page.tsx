@@ -50,6 +50,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import ShiprocketTrackingDisplay from "@/app/_components/ShiprocketTrackingDisplay";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -91,6 +92,8 @@ interface Order {
   pincode: string;
   country: string;
   email: string;
+
+  awb?: string;
 
   invoiceUrl?: string;
 
@@ -177,6 +180,8 @@ const sanitizeOrder = (data: any): Order => {
 
     email: extractString(data.email || addr.email),
 
+    awb: extractString(data.awb),
+
     invoiceUrl: data.invoiceUrl ? extractString(data.invoiceUrl) : undefined,
 
     createdAt: extractString(data.createdAt),
@@ -230,6 +235,8 @@ export default function SellerOrderDetailsPage() {
 
   const [uploading, setUploading] = useState(false);
 
+  const [awbInput, setAwbInput] = useState("");
+
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/sign-in");
@@ -252,6 +259,7 @@ export default function SellerOrderDetailsPage() {
         console.log("SHIPPING ADDRESS", orderData.shippingAddress);
 
         setOrder(sanitizeOrder(orderData));
+        setAwbInput(sanitizeOrder(orderData).awb || "");
       } else {
         router.push("/seller-dashboard/orders");
       }
@@ -314,6 +322,31 @@ export default function SellerOrderDetailsPage() {
           color: "#fff",
         },
       });
+    }
+  };
+
+  const handleAwbUpdate = async () => {
+    if (!order) return;
+    const toastId = toast.loading("Updating AWB...");
+    try {
+      // We can use the existing PATCH endpoint for orders.
+      // You'll need to ensure your `/api/orders/[id]` route can handle updating the `awb` field.
+      const response = await fetch(`/api/orders/${order.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ awb: awbInput }),
+      });
+
+      if (response.ok) {
+        const updatedOrderData = await response.json();
+        setOrder(sanitizeOrder(updatedOrderData));
+        toast.success("AWB updated successfully", { id: toastId });
+      } else {
+        toast.error("Failed to update AWB", { id: toastId });
+      }
+    } catch (error) {
+      console.error("Error updating AWB:", error);
+      toast.error("Failed to update AWB", { id: toastId });
     }
   };
 
@@ -1057,6 +1090,42 @@ export default function SellerOrderDetailsPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* SHIPMENT */}
+            <Card className="mb-6 bg-[#111111] border border-white/10 rounded-[2rem] overflow-hidden">
+              <CardHeader className="border-b border-white/5 p-8">
+                <CardTitle className="text-3xl font-black tracking-tight">
+                  Shipment Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="awb" className="text-zinc-500">AWB / Tracking Number</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        id="awb"
+                        value={awbInput}
+                        onChange={(e) => setAwbInput(e.target.value)}
+                        placeholder="Enter tracking number"
+                        className="bg-[#181818] border-white/10"
+                      />
+                      <Button onClick={handleAwbUpdate} className="bg-[#4ca626] hover:bg-[#5bbd31]">
+                        Save AWB
+                      </Button>
+                    </div>
+                  </div>
+                  {order.awb && (
+                    <div className="mt-6 pt-6 border-t border-white/5">
+                      <h4 className="text-lg font-bold text-white mb-4">Live Tracking Status</h4>
+                      <div className="bg-[#101010] p-5 rounded-2xl border border-white/5">
+                        <ShiprocketTrackingDisplay awb={order.awb} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

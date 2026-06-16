@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from "react-hot-toast";
 import { Loader2, Download, Eye } from 'lucide-react';
 import BottomNav from '@/app/_components/BottomNav';
+import ShiprocketTrackingDisplay from '@/app/_components/ShiprocketTrackingDisplay';
 
 interface OrderItem {
   id: string;
@@ -68,6 +69,7 @@ interface Order {
   pincode?: string;
   postalCode?: string;
   country?: string;
+  awb?: string;
 }
 const getAddressValue = (
   value?: string | null,
@@ -303,6 +305,14 @@ export default function OrderCompletePage() {
                       </div>
                     </div>
                   )}
+              {order.awb && (
+                <div className="pt-4 border-t border-white/10">
+                  <p className="text-zinc-400 text-sm mb-3">Shipment Tracking</p>
+                  <div className="bg-[#181818] p-4 rounded-xl border border-white/5">
+                    <ShiprocketTrackingDisplay awb={order.awb} />
+                  </div>
+                </div>
+              )}
                 </div>
 
                 <div className="bg-[#181818] border border-white/5 rounded-2xl p-6 h-fit">

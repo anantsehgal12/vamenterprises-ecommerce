@@ -107,6 +107,9 @@ export async function PATCH(
     const {
       cancelReason,
       cancelDescription,
+      awb,
+      status,
+      paymentMethod,
     } = body;
 
     const order =
@@ -121,46 +124,70 @@ export async function PATCH(
       );
     }
 
-    if (order.userId !== userId) {
+    const clerk = await clerkClient();
+    const currentUser = await clerk.users.getUser(userId);
+    const isAdmin = currentUser.publicMetadata?.role === "admin";
+
+    if (order.userId !== userId && !isAdmin) {
       return NextResponse.json(
         { error: "Access denied" },
         { status: 403 }
       );
     }
 
-    // Restrict cancellation
-    if (
-      order.status === "SHIPPED" ||
-      order.status === "DELIVERED"
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Cannot cancel shipped or delivered orders",
-        },
-        { status: 400 }
-      );
+    const updateData: any = {};
+
+    // Handle Admin AWB update
+    if (awb !== undefined) {
+      if (!isAdmin) {
+        return NextResponse.json(
+          { error: "Only admins can update AWB" },
+          { status: 403 }
+        );
+      }
+      updateData.awb = awb;
     }
 
-    if (
-      order.status === "CANCELLED"
-    ) {
+    // Handle Admin Payment Method update
+    if (paymentMethod !== undefined) {
+      if (!isAdmin) {
+        return NextResponse.json({ error: "Only admins can update Payment Method" }, { status: 403 });
+      }
+      updateData.paymentMethod = paymentMethod;
+    }
+
+    // Handle order cancellation
+    if (cancelReason || status === "CANCELLED" || status === "cancelled") {
+      // Restrict cancellation
+      if (order.status === "SHIPPED" || order.status === "DELIVERED") {
+        return NextResponse.json(
+          { error: "Cannot cancel shipped or delivered orders" },
+          { status: 400 }
+        );
+      }
+
+      if (order.status === "CANCELLED") {
+        return NextResponse.json(
+          { error: "Order is already cancelled" },
+          { status: 400 }
+        );
+      }
+
+      updateData.status = "CANCELLED";
+      if (cancelReason) updateData.cancelReason = cancelReason;
+      if (cancelDescription) updateData.cancelDescription = cancelDescription;
+    }
+
+    if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
-        {
-          error:
-            "Order is already cancelled",
-        },
+        { error: "No valid update data provided" },
         { status: 400 }
       );
     }
 
     const updatedOrder = await db
       .update(Order)
-      .set({
-        status: "CANCELLED",
-        cancelReason,
-        cancelDescription,
-      })
+      .set(updateData)
       .where(eq(Order.id, id))
       .returning();
 

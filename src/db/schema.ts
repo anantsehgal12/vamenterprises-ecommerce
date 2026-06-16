@@ -17,6 +17,7 @@ import { relations } from "drizzle-orm";
 
 export const taxRateEnum = pgEnum("tax_rate_enum", ["0", "5", "12", "18", "20", "40"]);
 export const isOptionalEnum = pgEnum("is_optional_enum", ["Yes", "No"]);
+export const paymentMethodEnum = pgEnum("payment_method_enum", ["Razorpay", "COD"]);
 
 /* =========================================================
    CATEGORY
@@ -64,6 +65,8 @@ export const Product = pgTable("Product", {
   categoryId: uuid("category_id").references(() => Category.id, {
     onDelete: "set null",
   }),
+
+  paymentMethod: paymentMethodEnum("payment_method"),
 
   variants: jsonb("variants").$type<
     {
@@ -185,7 +188,7 @@ export const Order = pgTable("Order", {
     .default("pending")
     .notNull(),
 
-  paymentMethod: varchar("payment_method", { length: 50 })
+  paymentMethod: paymentMethodEnum("payment_method")
     .default("Razorpay")
     .notNull(),
 
@@ -202,6 +205,8 @@ export const Order = pgTable("Order", {
   }>(),
 
   invoiceUrl: text("invoice_url"),
+
+  awb: varchar("awb", { length: 255 }),
 
   cancelReason: varchar("cancel_reason", { length: 255 }),
 
