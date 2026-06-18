@@ -8,6 +8,7 @@ import Lenis from "lenis";
 import { cn } from "@/lib/utils";
 import localFont from "next/font/local";
 import SmoothScrolling from "./_components/home/SmoothScrolling";
+import { useTheme } from "next-themes";
 
 
 const geistSans = Geist({
@@ -60,10 +61,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-      }}
-    >
+            appearance={{
+              theme: dark,
+            }}
+          >
       <html lang="en" className={cn(jetMono.variable, "font-jet-mono")} suppressHydrationWarning>
         <body
           className={`antialiased font-jet-mono`}
@@ -71,6 +72,7 @@ export default function RootLayout({
           <SmoothScrolling />
           <Toaster position="bottom-right"/>
           {children}
+              
         </body>
       </html>
     </ClerkProvider>
