@@ -9,7 +9,7 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, setSearchTerm }) => {
   return (
-    <div className="flex items-center pb-8 relative leading-[28px]">
+    <div className="flex flex-1 items-center pb-8 relative leading-[28px]">
       <svg
         viewBox="0 0 24 24"
         aria-hidden="true"
