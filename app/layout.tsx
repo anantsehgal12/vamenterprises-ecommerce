@@ -1,5 +1,11 @@
 import React from "react";
-import { Geist, Geist_Mono, Inter, JetBrains_Mono, Space_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Inter,
+  JetBrains_Mono,
+  Space_Mono,
+} from "next/font/google";
 import "./globals.css";
 import { dark } from "@clerk/themes";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -9,7 +15,7 @@ import { cn } from "@/lib/utils";
 import localFont from "next/font/local";
 import SmoothScrolling from "./_components/home/SmoothScrolling";
 import { useTheme } from "next-themes";
-
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -61,18 +67,20 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
-            appearance={{
-              theme: dark,
-            }}
-          >
-      <html lang="en" className={cn(jetMono.variable, "font-jet-mono")} suppressHydrationWarning>
-        <body
-          className={`antialiased font-jet-mono`}
-        >
+      appearance={{
+        theme: dark,
+      }}
+    >
+      <html
+        lang="en"
+        className={cn(jetMono.variable, "font-jet-mono")}
+        suppressHydrationWarning
+      >
+        <body className={`antialiased font-jet-mono`}>
           <SmoothScrolling />
-          <Toaster position="bottom-right"/>
+          <Toaster position="bottom-right" />
           {children}
-              
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
