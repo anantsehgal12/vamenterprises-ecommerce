@@ -81,7 +81,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="w-xl px-4 sm:px-6 mx-auto">
+    <div className="w-full max-w-xl px-4 sm:px-6 mx-auto">
       <div className="rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl p-6 sm:p-8 shadow-2xl w-full">
         <section className="w-full flex items-center justify-center text-center py-4">
           <Image

@@ -24,7 +24,7 @@ export default function Page() {
             </span>
 
             <h1 className="mt-6 text-5xl font-bold tracking-tight text-white">
-              Sign In to Your Account
+              Sign In to VAM Enterprises
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-zinc-400">
