@@ -10,6 +10,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
+const mono = 'font-[family-name:var(--font-mono)]'
+
 interface Announcement {
   id: string;
   name: string;
@@ -27,8 +29,7 @@ export default function Announcements() {
         const response = await fetch("/api/announcement");
         if (response.ok) {
           const data = await response.json();
-          // Sort by newest first
-          const sorted = data.sort((a: Announcement, b: Announcement) => 
+          const sorted = data.sort((a: Announcement, b: Announcement) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           setAnnouncements(sorted);
@@ -48,22 +49,17 @@ export default function Announcements() {
   }
 
   return (
-    <div className="w-full bg-[#111111] border-b border-white/10 py-2.5 relative z-50">
+    <div className="w-full bg-black border-b border-white/10 py-2.5 relative z-50">
+      <div className="pointer-events-none absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#4ca626]/50 to-transparent" />
       <div className="container mx-auto px-10 relative">
-        <Carousel
-          opts={{
-            align: "center",
-            loop: true,
-          }}
-          className="w-full"
-        >
+        <Carousel opts={{ align: "center", loop: true }} className="w-full">
           <CarouselContent>
             {announcements.map((announcement) => (
               <CarouselItem key={announcement.id}>
                 <div className="flex items-center justify-center gap-3 h-10">
-                  <Megaphone className="h-4 w-4 text-[#7ddc56] shrink-0" />
-                  <div 
-                    className="text-md font-medium text-zinc-200 line-clamp-1 px-2 [&_p]:inline [&_a]:text-[#4ca626] [&_a:hover]:underline"
+                  <Megaphone className="h-4 w-4 text-[#4fd1c5] shrink-0" />
+                  <div
+                    className={`${mono} text-xs md:text-sm font-medium text-zinc-200 line-clamp-1 px-2 [&_p]:inline [&_a]:text-[#9be274] [&_a:hover]:underline`}
                     dangerouslySetInnerHTML={{ __html: announcement.message }}
                   />
                 </div>

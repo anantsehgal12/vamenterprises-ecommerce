@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   CirclePlus,
   HelpCircle,
-  ImagePlus,
   Package2,
   Plus,
   Sparkles,
@@ -105,7 +104,7 @@ export default function AddProductPage() {
         name: "",
       },
     ],
-    images: [{ url: "", storagePath: "", altText: "" }],
+    images: [],
   });
 
   const [calculatedFields, setCalculatedFields] = useState<CalculatedFields>({
@@ -119,7 +118,9 @@ export default function AddProductPage() {
 
   const [error, setError] = useState("");
 
-  const [uploadingImageIndex, setUploadingImageIndex] = useState<number | null>(null);
+  const [uploadingImageIndices, setUploadingImageIndices] = useState<number[]>([]);
+
+  const [isDragActive, setIsDragActive] = useState(false);
 
   const [categories, setCategories] = useState<{ id: string; name: string }[]>(
     [],
@@ -189,6 +190,91 @@ export default function AddProductPage() {
     setIsPriceWithTax(checked);
   };
 
+  const updateImage = (index: number, field: "url" | "altText" | "storagePath", value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.map((img, i) =>
+        i === index ? { ...img, [field]: value } : img,
+      ),
+    }));
+  };
+
+  const processFiles = async (files: FileList) => {
+    const fileArray = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    if (fileArray.length === 0) return;
+
+    setError("");
+    const startIndex = formData.images.length;
+
+    const newPlaceholders = fileArray.map((_, index) => ({
+      url: "",
+      storagePath: "",
+      altText: `Image ${startIndex + index + 1}`,
+    }));
+
+    const updatedImages = [...formData.images, ...newPlaceholders];
+    setFormData((prev) => ({ ...prev, images: updatedImages }));
+
+    const processingIndices = fileArray.map((_, index) => startIndex + index);
+    setUploadingImageIndices((prev) => [...prev, ...processingIndices]);
+
+    for (let i = 0; i < fileArray.length; i++) {
+      const targetIndex = startIndex + i;
+      try {
+        const { url, key } = await uploadProductImage(fileArray[i]);
+        setFormData((prev) => ({
+          ...prev,
+          images: prev.images.map((img, idx) =>
+            idx === targetIndex ? { ...img, url, storagePath: key } : img
+          ),
+        }));
+      } catch (err) {
+        console.error("Error uploading image asset:", err);
+        setError("Failed to upload one or more image files.");
+      } finally {
+        setUploadingImageIndices((prev) => prev.filter((idx) => idx !== targetIndex));
+      }
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
+    }
+  };
+
+  const removeImage = async (index: number) => {
+    const imageToRemove = formData.images[index];
+
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+
+    if (imageToRemove.storagePath) {
+      try {
+        await deleteProductImage(imageToRemove.storagePath);
+      } catch (err) {
+        console.error("Error removing image from storage:", err);
+      }
+    }
+  };
+
+  const validUploadedImagesCount = formData.images.filter((img) => img.url).length;
+
   const missingFields = [];
 
   if (!formData.name.trim()) missingFields.push("Product Name");
@@ -201,12 +287,15 @@ export default function AddProductPage() {
 
   if (!formData.categoryId) missingFields.push("Category");
 
+  if (validUploadedImagesCount === 0) missingFields.push("At least one product image");
+
   const hasTouchedFields =
     formData.name ||
     formData.price ||
     formData.stock ||
     formData.description ||
-    formData.categoryId;
+    formData.categoryId ||
+    formData.images.length > 0;
 
   const isReadyToPublish = missingFields.length === 0;
 
@@ -218,6 +307,10 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (validUploadedImagesCount === 0) {
+      setError("At least one product image is required.");
+      return;
+    }
 
     setLoading(true);
 
@@ -352,59 +445,6 @@ export default function AddProductPage() {
       ...prev,
       variants: prev.variants.filter((_, i) => i !== index),
     }));
-  };
-
-  const addImage = () => {
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, { url: "", storagePath: "", altText: "" }],
-    }));
-  };
-
-  const updateImage = (index: number, field: "url" | "altText" | "storagePath", value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.map((img, i) =>
-        i === index ? { ...img, [field]: value } : img,
-      ),
-    }));
-  };
-
-  const handleImageUpload = async (index: number, file: File) => {
-    try {
-      setUploadingImageIndex(index);
-
-      const { url, key } = await uploadProductImage(file);
-
-      setFormData((prev) => ({
-        ...prev,
-        images: prev.images.map((img, i) =>
-          i === index ? { ...img, url, storagePath: key } : img
-        ),
-      }));
-    } catch (err) {
-      console.error("Error uploading image:", err);
-      setError("Failed to upload image. Please try again.");
-    } finally {
-      setUploadingImageIndex(null);
-    }
-  };
-
-  const removeImage = async (index: number) => {
-    const imageToRemove = formData.images[index];
-
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
-
-    if (imageToRemove.storagePath) {
-      try {
-        await deleteProductImage(imageToRemove.storagePath);
-      } catch (err) {
-        console.error("Error removing image from storage:", err);
-      }
-    }
   };
 
   if (!isLoaded || !isSignedIn) {
@@ -737,17 +777,53 @@ export default function AddProductPage() {
                     </Select>
                   </Card>
 
+                  {/* Refactored Image Card with Drag-Drop Rectangle Area and Mandatory Check */}
                   <Card className="bg-[#111111] border border-white/10 rounded-3xl p-7">
                     <div className="flex items-center justify-between mb-8">
                       <div>
-                        <h2 className="text-xl font-semibold">Product Images</h2>
+                        <h2 className="text-xl font-semibold">
+                          Product Images <span className="text-red-500">*</span>
+                        </h2>
                         <p className="text-sm text-zinc-400 mt-1">
-                          Upload high-quality images of your product
+                          Upload at least one image file
                         </p>
                       </div>
                     </div>
 
                     <div className="space-y-6">
+                      {/* Batch Drag and Drop Zone Rectangle */}
+                      <div
+                        onDragEnter={handleDrag}
+                        onDragOver={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDrop={handleDrop}
+                        className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                          isDragActive
+                            ? "border-[#4ca626] bg-[#4ca626]/5"
+                            : "border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                        }`}
+                      >
+                        <label className="flex flex-col items-center justify-center w-full h-full text-zinc-400">
+                          <UploadCloud className={`w-10 h-10 mb-2 transition-transform ${isDragActive ? "scale-110 text-[#7ddc56]" : "text-zinc-500"}`} />
+                          <p className="text-sm">
+                            <span className="font-semibold text-white">Drag & drop images here</span> or click to select
+                          </p>
+                          <p className="text-xs text-zinc-500 mt-1">Accepts multiple image files at once</p>
+                          <Input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files.length > 0) {
+                                processFiles(e.target.files);
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+
+                      {/* Rendered Uploaded Images */}
                       {formData.images.map((image, imageIndex) => (
                         <div key={imageIndex} className="p-5 border border-white/10 rounded-2xl bg-[#181818]">
                           <div className="flex items-center justify-between mb-4">
@@ -769,7 +845,7 @@ export default function AddProductPage() {
                               <div className="flex flex-col sm:flex-row items-start gap-5">
                                 <img
                                   src={image.url}
-                                  alt="Preview"
+                                  alt={image.altText || "Preview"}
                                   className="w-28 h-28 object-cover rounded-xl border border-white/10 bg-[#111111]"
                                 />
                                 <div className="flex-1 space-y-3 w-full">
@@ -784,36 +860,20 @@ export default function AddProductPage() {
                                 </div>
                               </div>
                             ) : (
-                              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer bg-[#111111] hover:bg-[#1a1a1a] transition-colors">
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6 text-zinc-400">
-                                  {uploadingImageIndex === imageIndex ? (
-                                    <Loader2 className="w-8 h-8 mb-3 text-[#4ca626] animate-spin" />
-                                  ) : (
-                                    <UploadCloud className="w-8 h-8 mb-3 text-zinc-500" />
-                                  )}
-                                  <p className="text-sm">
-                                    <span className="font-semibold text-white">Click to upload</span> or drag and drop
-                                  </p>
-                                </div>
-                                <Input
-                                  type="file"
-                                  className="hidden"
-                                  accept="image/*"
-                                  disabled={uploadingImageIndex === imageIndex}
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) handleImageUpload(imageIndex, file);
-                                  }}
-                                />
-                              </label>
+                              <div className="flex items-center justify-center w-full h-24 bg-[#111111] border border-white/5 rounded-xl text-zinc-400">
+                                {uploadingImageIndices.includes(imageIndex) ? (
+                                  <div className="flex items-center gap-2">
+                                    <Loader2 className="w-5 h-5 text-[#4ca626] animate-spin" />
+                                    <span className="text-sm font-medium">Uploading asset...</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-sm text-zinc-500">Asset field configuration error</span>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
                       ))}
-                      <Button type="button" variant="outline" onClick={addImage} className="w-full border-white/10 bg-[#181818] hover:bg-[#1f1f1f] rounded-xl h-12">
-                        <ImagePlus className="h-4 w-4 mr-2" />
-                        Add Image
-                      </Button>
                     </div>
                   </Card>
 

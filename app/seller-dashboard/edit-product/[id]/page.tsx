@@ -57,7 +57,6 @@ interface ProductFormData {
   mrp: string;
   taxRate: string;
   stock: string;
-
   description: string;
   categoryId: string;
   isOptional: "Yes" | "No";
@@ -84,12 +83,11 @@ export default function EditProductPage() {
     mrp: "",
     taxRate: "18",
     stock: "",
-
     description: "",
     categoryId: "",
     isOptional: "No",
     variants: [{ name: "" }],
-    images: [{ url: "", storagePath: "", altText: "" }],
+    images: [],
   });
   const [calculatedFields, setCalculatedFields] = useState<CalculatedFields>({
     finalPrice: "0",
@@ -99,22 +97,12 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
-    [],
-  );
-  const [uploadingImageIndex, setUploadingImageIndex] = useState<number | null>(
-    null,
-  );
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [uploadingImageIndices, setUploadingImageIndices] = useState<number[]>([]);
+  const [isDragActive, setIsDragActive] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [taxRates, setTaxRates] = useState<any[]>([
-    "0",
-    "5",
-    "12",
-    "18",
-    "20",
-    "40",
-  ]);
+  const [taxRates, setTaxRates] = useState<any[]>(["0", "5", "12", "18", "20", "40"]);
 
   useEffect(() => {
     fetchProduct();
@@ -157,8 +145,7 @@ export default function EditProductPage() {
       const taxAmount = (price * taxRate) / 100;
       finalPrice = price + taxAmount;
     }
-    const discount =
-      mrp > 0 ? (((mrp - finalPrice) / mrp) * 100).toFixed(2) : "0";
+    const discount = mrp > 0 ? (((mrp - finalPrice) / mrp) * 100).toFixed(2) : "0";
     setCalculatedFields({
       finalPrice: Math.round(finalPrice).toString(),
       discount,
@@ -177,14 +164,12 @@ export default function EditProductPage() {
       }
       const product = await response.json();
 
-      // Transform the data to match form structure
       setFormData({
         name: product.name,
         price: product.price,
         mrp: product.mrp?.toString() || "",
         taxRate: product.taxRate?.toString() || "0",
         stock: product.stock?.toString() || "0",
-
         description: product.description,
         categoryId: product.categoryId,
         isOptional: product.isOptional || "No",
@@ -199,17 +184,15 @@ export default function EditProductPage() {
                 storagePath: img.storagePath,
                 altText: img.altText || "",
               }))
-            : [{ url: "", storagePath: "", altText: "" }],
+            : [],
       });
 
-      // Calculate final price and discount
       const price = parseFloat(product.price) || 0;
       const mrp = parseFloat(product.mrp) || 0;
       const taxRate = parseFloat(product.taxRate) || 0;
       const taxAmount = (price * taxRate) / 100;
       const finalPrice = price + taxAmount;
-      const discount =
-        mrp > 0 ? (((mrp - finalPrice) / mrp) * 100).toFixed(2) : "0";
+      const discount = mrp > 0 ? (((mrp - finalPrice) / mrp) * 100).toFixed(2) : "0";
       setCalculatedFields({
         finalPrice: Math.round(finalPrice).toString(),
         discount,
@@ -228,10 +211,7 @@ export default function EditProductPage() {
 
     try {
       const submittedPrice = isPriceWithTax
-        ? (
-            parseFloat(formData.price) /
-            (1 + parseFloat(formData.taxRate || "0") / 100)
-          ).toFixed(2)
+        ? (parseFloat(formData.price) / (1 + parseFloat(formData.taxRate || "0") / 100)).toFixed(2)
         : formData.price;
 
       const response = await fetch(`/api/products/${productId}`, {
@@ -294,9 +274,7 @@ export default function EditProductPage() {
   const updateVariant = (index: number, field: "name", value: string) => {
     setFormData((prev) => ({
       ...prev,
-      variants: prev.variants.map((v, i) =>
-        i === index ? { ...v, [field]: value } : v,
-      ),
+      variants: prev.variants.map((v, i) => (i === index ? { ...v, [field]: value } : v)),
     }));
   };
 
@@ -307,49 +285,81 @@ export default function EditProductPage() {
     }));
   };
 
-  const addImage = () => {
+  const addImagePlaceholder = () => {
     setFormData((prev) => ({
       ...prev,
       images: [...prev.images, { url: "", storagePath: "", altText: "" }],
     }));
   };
 
-  const updateImage = (
-    index: number,
-    field: "url" | "altText" | "storagePath",
-    value: string,
-  ) => {
+  const updateImage = (index: number, field: "url" | "altText" | "storagePath", value: string) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.map((img, i) =>
-        i === index ? { ...img, [field]: value } : img,
-      ),
+      images: prev.images.map((img, i) => (i === index ? { ...img, [field]: value } : img)),
     }));
   };
 
-  const handleImageUpload = async (index: number, file: File) => {
-    try {
-      setUploadingImageIndex(index);
+  const processFiles = async (files: FileList) => {
+    const fileArray = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    if (fileArray.length === 0) return;
 
-      const { url, key } = await uploadProductImage(file);
+    setError("");
+    const startIndex = formData.images.length;
 
-      setFormData((prev) => ({
-        ...prev,
-        images: prev.images.map((img, i) =>
-          i === index ? { ...img, url, storagePath: key } : img,
-        ),
-      }));
-    } catch (err) {
-      console.error("Error uploading image:", err);
-      setError("Failed to upload image. Please try again.");
-    } finally {
-      setUploadingImageIndex(null);
+    // Pre-populate placeholders with automatic sequential number naming
+    const newPlaceholders = fileArray.map((_, index) => ({
+      url: "",
+      storagePath: "",
+      altText: `Image ${startIndex + index + 1}`,
+    }));
+
+    const updatedImages = [...formData.images, ...newPlaceholders];
+    setFormData((prev) => ({ ...prev, images: updatedImages }));
+
+    const processingIndices = fileArray.map((_, index) => startIndex + index);
+    setUploadingImageIndices((prev) => [...prev, ...processingIndices]);
+
+    // Handle concurrent uploads sequentially matching their setup indices
+    for (let i = 0; i < fileArray.length; i++) {
+      const targetIndex = startIndex + i;
+      try {
+        const { url, key } = await uploadProductImage(fileArray[i]);
+        setFormData((prev) => ({
+          ...prev,
+          images: prev.images.map((img, idx) =>
+            idx === targetIndex ? { ...img, url, storagePath: key } : img
+          ),
+        }));
+      } catch (err) {
+        console.error("Error uploading image asset:", err);
+        setError("Failed to upload one or more image files.");
+      } finally {
+        setUploadingImageIndices((prev) => prev.filter((idx) => idx !== targetIndex));
+      }
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
     }
   };
 
   const removeImage = async (index: number) => {
     const imageToRemove = formData.images[index];
-
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
@@ -391,8 +401,7 @@ export default function EditProductPage() {
     );
   }
 
-  const missingFields =[];
-
+  const missingFields = [];
   if (!formData.name.trim()) missingFields.push("Product Name");
   if (!formData.price.trim()) missingFields.push("Selling Price");
   if (!formData.taxRate) missingFields.push("Tax Rate");
@@ -409,13 +418,8 @@ export default function EditProductPage() {
     formData.categoryId;
 
   const isReadyToPublish = missingFields.length === 0;
+  const productStatus = !hasTouchedFields ? "empty" : isReadyToPublish ? "ready" : "incomplete";
 
-  const productStatus = !hasTouchedFields
-    ? "empty"
-    : isReadyToPublish
-      ? "ready"
-      : "incomplete";
-  
   return (
     <SidebarProvider defaultOpen={false}>
       <AppSidebar />
@@ -429,15 +433,9 @@ export default function EditProductPage() {
                 <div className="h-14 w-14 rounded-2xl bg-[#4ca626]/20 border border-[#4ca626]/30 flex items-center justify-center">
                   <Pencil className="text-[#7ddc56]" />
                 </div>
-
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tight">
-                    Edit Product
-                  </h1>
-
-                  <p className="text-sm text-zinc-400 mt-1">
-                    Update your premium product listing
-                  </p>
+                  <h1 className="text-3xl font-bold tracking-tight">Edit Product</h1>
+                  <p className="text-sm text-zinc-400 mt-1">Update your premium product listing</p>
                 </div>
               </div>
 
@@ -468,54 +466,33 @@ export default function EditProductPage() {
             >
               <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-8">
                 <div className="space-y-8">
+                  {/* Basic Info Card */}
                   <Card className="bg-[#111111] border border-white/10 rounded-3xl p-7 shadow-2xl">
                     <div className="flex items-center gap-3 mb-8">
                       <Sparkles className="text-[#7ddc56]" />
-
                       <div>
-                        <h2 className="text-xl font-semibold">
-                          Product Information
-                        </h2>
-
-                        <p className="text-sm text-zinc-400 mt-1">
-                          Basic information about your product
-                        </p>
+                        <h2 className="text-xl font-semibold">Product Information</h2>
+                        <p className="text-sm text-zinc-400 mt-1">Basic information about your product</p>
                       </div>
                     </div>
 
                     <div className="space-y-6">
                       <div>
-                        <Label className="mb-3 block text-zinc-300">
-                          Product Name
-                        </Label>
-
+                        <Label className="mb-3 block text-zinc-300">Product Name</Label>
                         <Input
                           value={formData.name}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              name: e.target.value,
-                            }))
-                          }
+                          onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                           placeholder="Enter Your Product Name"
                           className="h-14 rounded-2xl bg-[#181818] border-white/10 focus-visible:ring-[#4ca626]"
                         />
                       </div>
 
                       <div>
-                        <Label className="mb-3 block text-zinc-300">
-                          Description
-                        </Label>
-
+                        <Label className="mb-3 block text-zinc-300">Description</Label>
                         <Textarea
                           rows={6}
                           value={formData.description}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              description: e.target.value,
-                            }))
-                          }
+                          onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                           placeholder="Write a stunning product description..."
                           className="rounded-2xl bg-[#181818] border-white/10 resize-none focus-visible:ring-[#4ca626]"
                         />
@@ -523,38 +500,26 @@ export default function EditProductPage() {
 
                       <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#181818] p-5">
                         <div className="space-y-0.5">
-                          <Label className="text-zinc-300">
-                            Optional Product
-                          </Label>
-                          <p className="text-sm text-zinc-500">
-                            Is this product optional?
-                          </p>
+                          <Label className="text-zinc-300">Optional Product</Label>
+                          <p className="text-sm text-zinc-500">Is this product optional?</p>
                         </div>
                         <Switch
                           checked={formData.isOptional === "Yes"}
                           onCheckedChange={(checked) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              isOptional: checked ? "Yes" : "No",
-                            }))
+                            setFormData((prev) => ({ ...prev, isOptional: checked ? "Yes" : "No" }))
                           }
                         />
                       </div>
                     </div>
                   </Card>
 
+                  {/* Pricing Card */}
                   <Card className="bg-[#111111] border border-white/10 rounded-3xl p-7">
                     <div className="flex items-center justify-between mb-8">
                       <div>
-                        <h2 className="text-xl font-semibold">
-                          Pricing & Inventory
-                        </h2>
-
-                        <p className="text-sm text-zinc-400 mt-1">
-                          Manage pricing and stock
-                        </p>
+                        <h2 className="text-xl font-semibold">Pricing & Inventory</h2>
+                        <p className="text-sm text-zinc-400 mt-1">Manage pricing and stock</p>
                       </div>
-
                       <Badge className="bg-[#4ca626]/20 text-[#8ded66] border border-[#4ca626]/30">
                         Live Calculation
                       </Badge>
@@ -563,15 +528,9 @@ export default function EditProductPage() {
                     <div className="grid md:grid-cols-2 gap-5">
                       <div>
                         <Label className="mb-3 block text-zinc-300">MRP</Label>
-
                         <Input
                           value={formData.mrp}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              mrp: e.target.value,
-                            }))
-                          }
+                          onChange={(e) => setFormData((prev) => ({ ...prev, mrp: e.target.value }))}
                           placeholder="₹ 4999"
                           className="h-14 rounded-2xl bg-[#181818] border-white/10"
                         />
@@ -579,43 +538,25 @@ export default function EditProductPage() {
 
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <Label className="block text-zinc-300">
-                            Selling Price
-                          </Label>
+                          <Label className="block text-zinc-300">Selling Price</Label>
                           <div className="flex items-center gap-2">
-                            <Label className="text-xs text-zinc-400">
-                              With Tax
-                            </Label>
-                            <Switch
-                              checked={isPriceWithTax}
-                              onCheckedChange={handleTaxToggle}
-                            />
+                            <Label className="text-xs text-zinc-400">With Tax</Label>
+                            <Switch checked={isPriceWithTax} onCheckedChange={handleTaxToggle} />
                           </div>
                         </div>
-
                         <Input
                           value={formData.price}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              price: e.target.value,
-                            }))
-                          }
+                          onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
                           placeholder="₹ 3999"
                           className="h-14 rounded-2xl bg-[#181818] border-white/10"
                         />
                       </div>
 
                       <div>
-                        <Label className="mb-3 block text-zinc-300">
-                          Tax Rate
-                        </Label>
-
+                        <Label className="mb-3 block text-zinc-300">Tax Rate</Label>
                         <Select
                           value={formData.taxRate || undefined}
-                          onValueChange={(value) =>
-                            setFormData((prev) => ({ ...prev, taxRate: value }))
-                          }
+                          onValueChange={(value) => setFormData((prev) => ({ ...prev, taxRate: value }))}
                         >
                           <SelectTrigger className="h-14 rounded-2xl bg-[#181818] border-white/10 w-full p-7">
                             <SelectValue placeholder="Select Tax Rate" />
@@ -625,13 +566,8 @@ export default function EditProductPage() {
                               const value =
                                 typeof tax === "string"
                                   ? tax
-                                  : tax.rate?.toString() ||
-                                    tax.value?.toString() ||
-                                    tax.id?.toString();
-                              const label =
-                                typeof tax === "string"
-                                  ? `${tax}%`
-                                  : tax.name || `${tax.rate}%`;
+                                  : tax.rate?.toString() || tax.value?.toString() || tax.id?.toString();
+                              const label = typeof tax === "string" ? `${tax}%` : tax.name || `${tax.rate}%`;
                               return value ? (
                                 <SelectItem key={value || idx} value={value}>
                                   {label}
@@ -643,18 +579,10 @@ export default function EditProductPage() {
                       </div>
 
                       <div>
-                        <Label className="mb-3 block text-zinc-300">
-                          Stock
-                        </Label>
-
+                        <Label className="mb-3 block text-zinc-300">Stock</Label>
                         <Input
                           value={formData.stock}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              stock: e.target.value,
-                            }))
-                          }
+                          onChange={(e) => setFormData((prev) => ({ ...prev, stock: e.target.value }))}
                           placeholder="120"
                           className="h-14 rounded-2xl bg-[#181818] border-white/10"
                         />
@@ -664,15 +592,12 @@ export default function EditProductPage() {
                     <div className="grid grid-cols-2 gap-5 mt-7">
                       <div className="rounded-2xl border border-white/10 bg-[#181818] p-5">
                         <p className="text-sm text-zinc-400">Final Price</p>
-
                         <h3 className="text-3xl font-bold mt-2 text-[#7ddc56]">
                           ₹{calculatedFields.finalPrice}
                         </h3>
                       </div>
-
                       <div className="rounded-2xl border border-white/10 bg-[#181818] p-5">
                         <p className="text-sm text-zinc-400">Discount</p>
-
                         <h3 className="text-3xl font-bold mt-2 text-white">
                           {calculatedFields.discount}%
                         </h3>
@@ -680,50 +605,33 @@ export default function EditProductPage() {
                     </div>
                   </Card>
 
+                  {/* Category Card */}
                   <Card className="bg-[#111111] border border-white/10 rounded-3xl p-7">
                     <div className="flex items-center justify-between mb-8">
                       <div>
                         <h2 className="text-xl font-semibold">Category</h2>
-
-                        <p className="text-sm text-zinc-400 mt-1">
-                          Organize your product
-                        </p>
+                        <p className="text-sm text-zinc-400 mt-1">Organize your product</p>
                       </div>
 
-                      <Dialog
-                        open={isDialogOpen}
-                        onOpenChange={setIsDialogOpen}
-                      >
+                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="bg-[#4ca626] hover:bg-[#5bbd31] rounded-xl"
-                          >
+                          <Button type="button" size="sm" className="bg-[#4ca626] hover:bg-[#5bbd31] rounded-xl">
                             <Plus className="h-4 w-4 mr-2" />
                             Add New
                           </Button>
                         </DialogTrigger>
-
                         <DialogContent className="bg-[#111111] border-white/10 text-white">
                           <DialogHeader>
                             <DialogTitle>Create New Category</DialogTitle>
                           </DialogHeader>
-
                           <div className="space-y-4">
                             <Input
                               value={newCategoryName}
-                              onChange={(e) =>
-                                setNewCategoryName(e.target.value)
-                              }
+                              onChange={(e) => setNewCategoryName(e.target.value)}
                               placeholder="Category Name"
                               className="h-12 rounded-xl bg-[#181818] border-white/10"
                             />
-
-                            <Button
-                              onClick={handleCreateCategory}
-                              className="w-full bg-[#4ca626] hover:bg-[#5bbd31]"
-                            >
+                            <Button onClick={handleCreateCategory} className="w-full bg-[#4ca626] hover:bg-[#5bbd31]">
                               Create Category
                             </Button>
                           </div>
@@ -733,17 +641,11 @@ export default function EditProductPage() {
 
                     <Select
                       value={formData.categoryId}
-                      onValueChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          categoryId: value,
-                        }))
-                      }
+                      onValueChange={(value) => setFormData((prev) => ({ ...prev, categoryId: value }))}
                     >
                       <SelectTrigger className="h-14 w-full rounded-2xl bg-[#181818] border-white/10">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-
                       <SelectContent>
                         {categories.map((category) => (
                           <SelectItem key={category.id} value={category.id}>
@@ -754,24 +656,51 @@ export default function EditProductPage() {
                     </Select>
                   </Card>
 
+                  {/* Images Card with Batch Drag and Drop Dropzone */}
                   <Card className="bg-[#111111] border border-white/10 rounded-3xl p-7">
                     <div className="flex items-center justify-between mb-8">
                       <div>
-                        <h2 className="text-xl font-semibold">
-                          Product Images
-                        </h2>
-                        <p className="text-sm text-zinc-400 mt-1">
-                          Upload high-quality images of your product
-                        </p>
+                        <h2 className="text-xl font-semibold">Product Images</h2>
+                        <p className="text-sm text-zinc-400 mt-1">Upload single or multiple images</p>
                       </div>
                     </div>
 
                     <div className="space-y-6">
+                      {/* Master Batch Dropzone */}
+                      <div
+                        onDragEnter={handleDrag}
+                        onDragOver={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDrop={handleDrop}
+                        className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+                          isDragActive
+                            ? "border-[#4ca626] bg-[#4ca626]/5"
+                            : "border-white/10 bg-[#181818] hover:bg-[#1f1f1f]"
+                        }`}
+                      >
+                        <label className="flex flex-col items-center justify-center w-full h-full text-zinc-400">
+                          <UploadCloud className={`w-10 h-10 mb-2 transition-transform ${isDragActive ? "scale-110 text-[#7ddc56]" : "text-zinc-500"}`} />
+                          <p className="text-sm">
+                            <span className="font-semibold text-white">Drag & drop images here</span> or click to select
+                          </p>
+                          <p className="text-xs text-zinc-500 mt-1">Accepts multiple image files at once</p>
+                          <Input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files.length > 0) {
+                                processFiles(e.target.files);
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+
+                      {/* Displayed Image List */}
                       {formData.images.map((image, imageIndex) => (
-                        <div
-                          key={imageIndex}
-                          className="p-5 border border-white/10 rounded-2xl bg-[#181818]"
-                        >
+                        <div key={imageIndex} className="p-5 border border-white/10 rounded-2xl bg-[#181818]">
                           <div className="flex items-center justify-between mb-4">
                             <Label className="text-md font-medium text-white">
                               Image {imageIndex + 1}
@@ -791,86 +720,48 @@ export default function EditProductPage() {
                               <div className="flex flex-col sm:flex-row items-start gap-5">
                                 <img
                                   src={image.url}
-                                  alt="Preview"
+                                  alt={image.altText || "Preview"}
                                   className="w-28 h-28 object-cover rounded-xl border border-white/10 bg-[#111111]"
                                 />
                                 <div className="flex-1 space-y-3 w-full">
-                                  <Label className="text-sm text-zinc-400">
-                                    Alt Text
-                                  </Label>
+                                  <Label className="text-sm text-zinc-400">Alt Text</Label>
                                   <Input
                                     type="text"
                                     value={image.altText}
-                                    onChange={(e) =>
-                                      updateImage(
-                                        imageIndex,
-                                        "altText",
-                                        e.target.value,
-                                      )
-                                    }
+                                    onChange={(e) => updateImage(imageIndex, "altText", e.target.value)}
                                     placeholder="A descriptive alt text"
                                     className="w-full h-12 rounded-xl bg-[#111111] border-white/10"
                                   />
                                 </div>
                               </div>
                             ) : (
-                              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer bg-[#111111] hover:bg-[#1a1a1a] transition-colors">
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6 text-zinc-400">
-                                  {uploadingImageIndex === imageIndex ? (
-                                    <Loader2 className="w-8 h-8 mb-3 text-[#4ca626] animate-spin" />
-                                  ) : (
-                                    <UploadCloud className="w-8 h-8 mb-3 text-zinc-500" />
-                                  )}
-                                  <p className="text-sm">
-                                    <span className="font-semibold text-white">
-                                      Click to upload
-                                    </span>{" "}
-                                    or drag and drop
-                                  </p>
-                                </div>
-                                <Input
-                                  type="file"
-                                  className="hidden"
-                                  accept="image/*"
-                                  disabled={uploadingImageIndex === imageIndex}
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file)
-                                      handleImageUpload(imageIndex, file);
-                                  }}
-                                />
-                              </label>
+                              <div className="flex items-center justify-center w-full h-24 bg-[#111111] border border-white/5 rounded-xl text-zinc-400">
+                                {uploadingImageIndices.includes(imageIndex) ? (
+                                  <div className="flex items-center gap-2">
+                                    <Loader2 className="w-5 h-5 text-[#4ca626] animate-spin" />
+                                    <span className="text-sm font-medium">Uploading asset...</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-sm text-zinc-500">Empty configuration slot</span>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
                       ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addImage}
-                        className="w-full border-white/10 bg-[#181818] hover:bg-[#1f1f1f] rounded-xl h-12"
-                      >
-                        <ImagePlus className="h-4 w-4 mr-2" />
-                        Add Image
-                      </Button>
+
+                      
                     </div>
                   </Card>
 
+                  {/* Variants Card */}
                   <Card className="bg-[#111111] border border-white/10 rounded-3xl p-7">
                     <div className="flex items-center justify-between mb-8">
                       <div>
                         <h2 className="text-xl font-semibold">Variants</h2>
-
-                        <p className="text-sm text-zinc-400 mt-1">
-                          Add product variations and images
-                        </p>
+                        <p className="text-sm text-zinc-400 mt-1">Add product variations and images</p>
                       </div>
-
-                      <Button
-                        type="button"
-                        onClick={addVariant}
-                        className="bg-[#4ca626] hover:bg-[#5bbd31] rounded-xl"
-                      >
+                      <Button type="button" onClick={addVariant} className="bg-[#4ca626] hover:bg-[#5bbd31] rounded-xl">
                         <Plus className="h-4 w-4 mr-2" />
                         Add Variant
                       </Button>
@@ -878,27 +769,17 @@ export default function EditProductPage() {
 
                     <div className="space-y-6">
                       {formData.variants.map((variant, variantIndex) => (
-                        <div
-                          key={variantIndex}
-                          className="rounded-3xl border border-white/10 bg-[#181818] overflow-hidden"
-                        >
+                        <div key={variantIndex} className="rounded-3xl border border-white/10 bg-[#181818] overflow-hidden">
                           <div className="border-b border-white/10 p-5 flex items-center justify-between bg-[#141414]">
                             <div className="flex items-center gap-4">
                               <div className="h-12 w-12 rounded-2xl bg-[#4ca626]/20 flex items-center justify-center">
                                 <Package2 className="h-5 w-5 text-[#7ddc56]" />
                               </div>
-
                               <div>
-                                <h3 className="font-semibold">
-                                  Variant {variantIndex + 1}
-                                </h3>
-
-                                <p className="text-sm text-zinc-400">
-                                  Configure this variation
-                                </p>
+                                <h3 className="font-semibold">Variant {variantIndex + 1}</h3>
+                                <p className="text-sm text-zinc-400">Configure this variation</p>
                               </div>
                             </div>
-
                             <Button
                               type="button"
                               size="icon"
@@ -912,19 +793,10 @@ export default function EditProductPage() {
 
                           <div className="p-6 space-y-6">
                             <div>
-                              <Label className="mb-3 block text-zinc-300">
-                                Variant Name
-                              </Label>
-
+                              <Label className="mb-3 block text-zinc-300">Variant Name</Label>
                               <Input
                                 value={variant.name}
-                                onChange={(e) =>
-                                  updateVariant(
-                                    variantIndex,
-                                    "name",
-                                    e.target.value,
-                                  )
-                                }
+                                onChange={(e) => updateVariant(variantIndex, "name", e.target.value)}
                                 placeholder="Black / XL / 256GB"
                                 className="h-14 rounded-2xl bg-[#101010] border-white/10"
                               />
@@ -936,22 +808,19 @@ export default function EditProductPage() {
                   </Card>
                 </div>
 
+                {/* Sidebar Preview Elements */}
                 <div className="space-y-6 sticky top-28 h-fit">
                   <Card className="bg-gradient-to-br from-[#151515] to-[#101010] border border-white/10 rounded-3xl overflow-hidden">
                     <section className="p-4 pb-0">
                       <div className="overflow-hidden rounded-2xl h-80 bg-gradient-to-br from-[#4ca626]/30 to-transparent flex items-center justify-center border border-white/10">
                         {(() => {
-                          const validImages = formData.images.filter(
-                            (img) => img.url,
-                          );
+                          const validImages = formData.images.filter((img) => img.url);
                           return validImages.length > 0 ? (
                             <ProductGallery
                               images={validImages.map((img, index) => ({
                                 id: img.id || img.storagePath || index,
                                 src: img.url,
-                                alt:
-                                  img.altText ||
-                                  `${formData.name} - Image ${index + 1}`,
+                                alt: img.altText || `${formData.name} - Image ${index + 1}`,
                               }))}
                               productName={formData.name}
                             />
@@ -965,16 +834,11 @@ export default function EditProductPage() {
                     <div className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <h2 className="text-2xl font-bold">
-                            {formData.name || "Your Product"}
-                          </h2>
-
+                          <h2 className="text-2xl font-bold">{formData.name || "Your Product"}</h2>
                           <p className="text-zinc-400 text-sm mt-2 line-clamp-3">
-                            {formData.description ||
-                              "Your premium product description will appear here."}
+                            {formData.description || "Your premium product description will appear here."}
                           </p>
                         </div>
-
                         <Badge className="bg-[#4ca626]/20 text-[#8ded66] border border-[#4ca626]/30">
                           Editing
                         </Badge>
@@ -985,31 +849,18 @@ export default function EditProductPage() {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <span className="text-zinc-400">Selling Price</span>
-
-                          <span className="text-xl font-bold">
-                            ₹{calculatedFields.finalPrice || "0"}
-                          </span>
+                          <span className="text-xl font-bold">₹{calculatedFields.finalPrice || "0"}</span>
                         </div>
-
                         <div className="flex items-center justify-between">
                           <span className="text-zinc-400">MRP</span>
-
-                          <span className="text-zinc-500 line-through">
-                            ₹{formData.mrp || "0"}
-                          </span>
+                          <span className="text-zinc-500 line-through">₹{formData.mrp || "0"}</span>
                         </div>
-
                         <div className="flex items-center justify-between">
                           <span className="text-zinc-400">Discount</span>
-
-                          <span className="text-[#7ddc56] font-semibold">
-                            {calculatedFields.discount}%
-                          </span>
+                          <span className="text-[#7ddc56] font-semibold">{calculatedFields.discount}%</span>
                         </div>
-
                         <div className="flex items-center justify-between">
                           <span className="text-zinc-400">Stock</span>
-
                           <span>{formData.stock || 0} units</span>
                         </div>
                       </div>
@@ -1019,7 +870,6 @@ export default function EditProductPage() {
                   <Card className="bg-[#111111] border border-white/10 rounded-3xl p-6">
                     <div className="flex items-center justify-between mb-5">
                       <h3 className="font-semibold">Product Status</h3>
-
                       {productStatus === "incomplete" && (
                         <HoverCard openDelay={150}>
                           <HoverCardTrigger asChild>
@@ -1027,23 +877,15 @@ export default function EditProductPage() {
                               <HelpCircle className="h-4 w-4 text-zinc-500 hover:text-white transition-colors" />
                             </button>
                           </HoverCardTrigger>
-
                           <HoverCardContent className="w-72 bg-[#111111] border border-white/10 text-white">
                             <div className="space-y-3">
                               <div className="flex items-center gap-2">
                                 <AlertCircle className="h-4 w-4 text-yellow-400" />
-
-                                <p className="font-medium">
-                                  Missing Required Fields
-                                </p>
+                                <p className="font-medium">Missing Required Fields</p>
                               </div>
-
                               <div className="space-y-2">
                                 {missingFields.map((field) => (
-                                  <div
-                                    key={field}
-                                    className="text-sm text-zinc-300"
-                                  >
+                                  <div key={field} className="text-sm text-zinc-300">
                                     • {field}
                                   </div>
                                 ))}
@@ -1055,52 +897,41 @@ export default function EditProductPage() {
                     </div>
 
                     <div
-                      className={`
-                        rounded-2xl border p-5 transition-all
-                        ${
-                          productStatus === "empty"
-                            ? "bg-red-500/10 border-red-500/20"
-                            : productStatus === "incomplete"
-                              ? "bg-yellow-500/10 border-yellow-500/20"
-                              : "bg-[#4ca626]/10 border-[#4ca626]/20"
-                        }
-                      `}
+                      className={`rounded-2xl border p-5 transition-all ${
+                        productStatus === "empty"
+                          ? "bg-red-500/10 border-red-500/20"
+                          : productStatus === "incomplete"
+                          ? "bg-yellow-500/10 border-yellow-500/20"
+                          : "bg-[#4ca626]/10 border-[#4ca626]/20"
+                      }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`
-                            h-3 w-3 rounded-full
-                            ${
-                              productStatus === "empty"
-                                ? "bg-red-500"
-                                : productStatus === "incomplete"
-                                  ? "bg-yellow-400"
-                                  : "bg-[#4ca626]"
-                            }
-                          `}
+                          className={`h-3 w-3 rounded-full ${
+                            productStatus === "empty"
+                              ? "bg-red-500"
+                              : productStatus === "incomplete"
+                              ? "bg-yellow-400"
+                              : "bg-[#4ca626]"
+                          }`}
                         />
-
                         <div>
                           <p className="font-medium">
                             {productStatus === "empty"
                               ? "Not Ready"
                               : productStatus === "incomplete"
-                                ? "Incomplete"
-                                : "Ready to Publish"}
+                              ? "Incomplete"
+                              : "Ready to Publish"}
                           </p>
-
                           <p className="text-sm text-zinc-400 mt-1">
                             {productStatus === "empty"
                               ? "Fill required fields to continue"
                               : productStatus === "incomplete"
-                                ? `${missingFields.length} required fields remaining`
-                                : "Everything looks good"}
+                              ? `${missingFields.length} required fields remaining`
+                              : "Everything looks good"}
                           </p>
                         </div>
-
-                        {productStatus === "ready" && (
-                          <CheckCircle2 className="ml-auto text-[#7ddc56]" />
-                        )}
+                        {productStatus === "ready" && <CheckCircle2 className="ml-auto text-[#7ddc56]" />}
                       </div>
                     </div>
                   </Card>
