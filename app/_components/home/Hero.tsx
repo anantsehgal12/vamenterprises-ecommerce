@@ -41,7 +41,7 @@ function Hero() {
               transition={{ duration: 0.9, delay: 0.15 }}
               className={`${display} max-w-3xl text-4xl font-medium leading-[1.08] text-[#ece2cd] md:text-6xl lg:text-7xl`}
             >
-              The One-Stop <span className="italic text-[#9be274]">Gifting</span> Atelier
+              The One-Stop <span className="italic text-[#9be274]">Gifting</span> Solution
             </motion.h1>
 
             <motion.p
