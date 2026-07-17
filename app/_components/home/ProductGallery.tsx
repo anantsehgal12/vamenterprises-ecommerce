@@ -42,54 +42,69 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="aspect-w-4 aspect-h-5 w-full overflow-hidden rounded-lg bg-gray-800 flex items-center justify-center text-gray-400">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] text-sm text-zinc-500">
         No images available
       </div>
     )
   }
 
   return (
-    <div className="w-full aspect-square">
+    <div className="w-full">
       {/* Carousel */}
       <div className="relative">
-        <Carousel setApi={setApi} className="w-full aspect-square">
+        <Carousel setApi={setApi} className="w-full">
           <CarouselContent>
-            {images.map((image, index) => (
+            {images.map((image) => (
               <CarouselItem key={image.id}>
-                <div className="aspect-square aspect-h-5 w-full overflow-hidden rounded-lg bg-gray-800">
+                <div className="group relative aspect-square w-full overflow-hidden rounded-2xl bg-zinc-900">
                   <img
                     src={image.src}
                     alt={image.alt ?? productName}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-4" />
-          <CarouselNext className="right-4" />
+
+          {images.length > 1 && (
+            <>
+              <CarouselPrevious className="left-4 border-white/10 bg-black/50 text-white backdrop-blur-md transition-colors hover:border-[#4ca626] hover:bg-[#4ca626] hover:text-black" />
+              <CarouselNext className="right-4 border-white/10 bg-black/50 text-white backdrop-blur-md transition-colors hover:border-[#4ca626] hover:bg-[#4ca626] hover:text-black" />
+
+              <div className="pointer-events-none absolute bottom-4 right-4 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-xs font-medium tracking-wide text-zinc-300 backdrop-blur-md">
+                {current + 1} / {images.length}
+              </div>
+            </>
+          )}
         </Carousel>
       </div>
 
       {/* Thumbnails */}
-      <div className="mt-4 grid grid-cols-4 gap-4">
-        {images.map((image, index) => (
-          <button
-            key={image.id}
-            onClick={() => scrollTo(index)}
-            className={cn(
-              "overflow-hidden rounded-md bg-gray-700 hover:ring-2 focus:outline-none transition-all",
-              current === index ? "ring-2 ring-white" : "hover:ring-white/50"
-            )}
-          >
-            <img
-              src={image.src}
-              alt={image.alt ?? productName}
-              className="h-20 w-full object-cover"
-            />
-          </button>
-        ))}
-      </div>
+      {images.length > 1 && (
+        <div className="mt-4 grid grid-cols-4 gap-3">
+          {images.map((image, index) => (
+            <button
+              key={image.id}
+              type="button"
+              onClick={() => scrollTo(index)}
+              aria-label={`View image ${index + 1}`}
+              className={cn(
+                "aspect-square overflow-hidden rounded-xl border bg-zinc-900 transition-all duration-300 focus:outline-none",
+                current === index
+                  ? "border-[#4ca626] shadow-[0_0_0_2px_rgba(76,166,38,0.35)]"
+                  : "border-white/10 opacity-60 hover:border-white/30 hover:opacity-100"
+              )}
+            >
+              <img
+                src={image.src}
+                alt={image.alt ?? productName}
+                className="h-full w-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

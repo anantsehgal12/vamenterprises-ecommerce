@@ -7,7 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
 
 interface Product {
   id: string;
@@ -31,9 +31,9 @@ interface YouMayAlsoLikeProps {
 
 const YouMayAlsoLike: React.FC<YouMayAlsoLikeProps> = ({ products }) => {
   return (
-    <div className="px-4 md:px-8 lg:px-15 py-6 md:py-10 w-full">
-      <div className="flex flex-col justify-center items-center">
-        <div className="w-full max-w-6xl mt-6 md:mt-8">
+    <div className="w-full py-2">
+      <div className="flex flex-col items-center justify-center">
+        <div className="mt-2 w-full max-w-6xl">
           <Carousel
             opts={{
               align: "start",
@@ -44,9 +44,9 @@ const YouMayAlsoLike: React.FC<YouMayAlsoLikeProps> = ({ products }) => {
               {products.filter((p: Product) => p.isOptional !== "Yes").map((product) => (
                 <CarouselItem
                   key={product.id}
-                  className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3"
+                  className="basis-[85%] sm:basis-1/2 md:basis-1/3 lg:basis-1/3"
                 >
-                  <div className="p-2 h-full">
+                  <div className="h-full p-2">
                     <Link
                       href={`/shop/${product.id}`}
                       className="group block h-full"
@@ -58,7 +58,7 @@ const YouMayAlsoLike: React.FC<YouMayAlsoLikeProps> = ({ products }) => {
                         {/* Image */}
                         <div className="relative overflow-hidden">
                           {product.images && product.images.length > 0 ? (
-                            <div className="relative h-60 w-full overflow-hidden">
+                            <div className="relative h-56 w-full overflow-hidden sm:h-60">
                               <img
                                 src={product.images[0].url}
                                 alt={product.images[0].altText || product.name}
@@ -69,28 +69,28 @@ const YouMayAlsoLike: React.FC<YouMayAlsoLikeProps> = ({ products }) => {
                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
                             </div>
                           ) : (
-                            <div className="flex h-60 items-center justify-center bg-zinc-900 text-zinc-500">
+                            <div className="flex h-56 items-center justify-center bg-zinc-900 text-sm text-zinc-500 sm:h-60">
                               No Image
                             </div>
                           )}
 
                           {/* Floating Button */}
                           <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                            <button className="rounded-full bg-[#4ca626] px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:scale-105 hover:bg-[#5cbf32]">
+                            <button className="rounded-full bg-[#4ca626] px-4 py-2 text-xs font-bold uppercase tracking-wider text-black shadow-lg transition hover:scale-105 hover:bg-[#5cbf32]">
                               View Product
                             </button>
                           </div>
                         </div>
 
                         {/* Content */}
-                        <div className="relative z-10 flex h-[200px] flex-col justify-between p-5">
+                        <div className="relative z-10 flex h-[190px] flex-col justify-between p-5 sm:h-[200px]">
                           <div>
                             <div className="mb-3 flex items-start justify-between gap-3">
                               <h3 className="line-clamp-1 text-lg font-bold tracking-tight text-white">
                                 {product.name}
                               </h3>
 
-                              <div className="rounded-full border border-[#4ca626]/20 bg-[#4ca626]/15 px-3 py-1 text-xs font-semibold text-[#9be274]">
+                              <div className="whitespace-nowrap rounded-full border border-[#4ca626]/20 bg-[#4ca626]/15 px-3 py-1 text-[11px] font-semibold text-[#9be274]">
                                 {product.stock && product.stock > 0 ? "In Stock" : "Available"}
                               </div>
                             </div>
@@ -117,8 +117,8 @@ const YouMayAlsoLike: React.FC<YouMayAlsoLikeProps> = ({ products }) => {
                             </div>
 
                             {/* Arrow */}
-                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-[#4ca626]/10 text-[#b8f59b] backdrop-blur-md transition-all duration-300 group-hover:rotate-6 group-hover:bg-[#4ca626] group-hover:text-white">
-                              →
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-[#4ca626]/10 text-[#b8f59b] backdrop-blur-md transition-all duration-300 group-hover:rotate-6 group-hover:bg-[#4ca626] group-hover:text-black">
+                              <ArrowUpRight className="h-5 w-5" />
                             </div>
                           </div>
                         </div>
@@ -131,8 +131,8 @@ const YouMayAlsoLike: React.FC<YouMayAlsoLikeProps> = ({ products }) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            <CarouselPrevious className="hidden border-white/10 bg-black/50 text-white backdrop-blur-md hover:border-[#4ca626] hover:bg-[#4ca626] hover:text-black md:flex" />
+            <CarouselNext className="hidden border-white/10 bg-black/50 text-white backdrop-blur-md hover:border-[#4ca626] hover:bg-[#4ca626] hover:text-black md:flex" />
           </Carousel>
         </div>
       </div>

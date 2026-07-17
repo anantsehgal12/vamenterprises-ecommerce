@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Navbar from "@/app/_components/home/Navbar";
 import AddToCartForm from "@/app/_components/home/AddToCartForm";
@@ -11,7 +11,7 @@ import YouMayAlsoLike from "@/app/_components/home/YouMayAlsoLike";
 import Footer from "@/app/_components/home/Footer";
 import BottomNav from "@/app/_components/home/BottomNav";
 import { Label } from "@/components/ui/label";
-import { Check, Copy, Tag, X } from "lucide-react"; // Added X icon to remove coupon
+import { Check, Copy, Gem, ShieldCheck, Tag, Truck, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface ProductImage {
@@ -170,7 +170,7 @@ export default function ProductDetailPage() {
     }
 
     getProduct();
-    fetchAvailableCoupons(); // Added call to fetch coupons on load
+    fetchAvailableCoupons();
   }, [productId]);
 
   useEffect(() => {
@@ -193,12 +193,18 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-[#050505] text-white">
         <Navbar />
-        <div className="flex min-h-[80vh] items-center justify-center">
-          <div className="flex flex-col items-center gap-5">
-            <div className="h-16 w-16 animate-spin rounded-full border-4 border-[#4ca626]/20 border-t-[#4ca626]" />
-            <p className="text-lg text-zinc-400">Loading Product...</p>
+        <div className="flex min-h-[80vh] items-center justify-center px-4">
+          <div className="flex flex-col items-center gap-6">
+            <div className="relative h-16 w-16">
+              <div className="absolute inset-0 rounded-full border-4 border-[#4ca626]/15" />
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-[#4ca626]" />
+              <div className="absolute inset-2 animate-pulse rounded-full bg-[#4ca626]/10 blur-md" />
+            </div>
+            <p className=" text-lg tracking-wide text-zinc-400">
+              Preparing your piece&hellip;
+            </p>
           </div>
         </div>
       </div>
@@ -270,7 +276,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-black text-white">
+    <div className="min-h-screen overflow-hidden bg-[#050505] text-white selection:bg-[#4ca626]/30 selection:text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -278,100 +284,148 @@ export default function ProductDetailPage() {
 
       <Navbar />
 
+      {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-[-10%] top-0 h-[500px] w-[500px] rounded-full bg-[#4ca626]/15 blur-3xl" />
-        <div className="absolute bottom-0 right-[-10%] h-[500px] w-[500px] rounded-full bg-[#4ca626]/10 blur-3xl" />
+        <div className="absolute left-[-15%] top-[-10%] h-[550px] w-[550px] rounded-full bg-[#4ca626]/[0.12] blur-[120px]" />
+        <div className="absolute bottom-[-15%] right-[-15%] h-[550px] w-[550px] rounded-full bg-[#4ca626]/[0.08] blur-[120px]" />
+        <div
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, white 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-2 pb-20 pt-8 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-24 lg:pt-10">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="mb-10">
-          <ol className="flex flex-wrap items-center gap-3 text-sm text-zinc-400">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-8 animate-in fade-in duration-700 lg:mb-12"
+        >
+          <ol className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-zinc-500">
             <li>
-              <Link href="/" className="transition hover:text-[#4ca626]">
+              <Link href="/" className="transition hover:text-[#8ef065]">
                 Home
               </Link>
             </li>
-            <li>/</li>
+            <li className="text-zinc-700">/</li>
             <li>
               <Link
                 href={`/shop?category=${product.category.id}`}
-                className="transition hover:text-[#4ca626]"
+                className="transition hover:text-[#8ef065]"
               >
                 {product.category.name}
               </Link>
             </li>
-            <li>/</li>
-            <li className="font-medium text-white">{product.name}</li>
+            <li className="text-zinc-700">/</li>
+            <li className="truncate text-zinc-300">{product.name}</li>
           </ol>
         </nav>
 
         {/* Main Section */}
-        <div className="grid gap-10 rounded-3xl bg-gradient-to-b from-zinc-900 to-black p-4 shadow-[0_20px_80px_-20px_rgba(76,166,38,0.35)] lg:grid-cols-2 lg:gap-20">
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           {/* Gallery */}
-          <div className="relative">
-            <div className="absolute inset-0 rounded-[2rem] blur-2xl " />
-            <div className="relative overflow-hidden rounded-[2rem] p-3 backdrop-blur-xl flex items-center justify-center h-full w-full">
-              <div className="space-y-4">
-                <ProductGallery
-                  images={galleryImages}
-                  productName={product.name}
-                />
+          <div className="animate-in fade-in slide-in-from-left-4 duration-700">
+            <div className="lg:sticky lg:top-24">
+              <div className="relative">
+                <div className="absolute -inset-6 rounded-[2.5rem] bg-[#4ca626]/10 blur-3xl" />
+                <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-b from-zinc-900/80 to-black p-3 shadow-[0_30px_100px_-20px_rgba(76,166,38,0.35)] backdrop-blur-xl sm:p-5">
+                  {/* Gift-ribbon signature badge */}
+                  <div className="pointer-events-none absolute -right-12 top-7 z-20 rotate-45">
+                    <div className="w-44 bg-gradient-to-r from-[#4ca626] to-[#3d8a1f] py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-black shadow-[0_4px_16px_rgba(76,166,38,0.5)]">
+                      Gift Ready
+                    </div>
+                  </div>
+                  <ProductGallery
+                    images={galleryImages}
+                    productName={product.name}
+                  />
+                </div>
+              </div>
+
+              {/* Trust strip */}
+              <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-3 text-center backdrop-blur-md">
+                  <ShieldCheck className="h-4 w-4 text-[#8ef065]" />
+                  <span className="text-[10px] font-medium leading-tight text-zinc-400 sm:text-xs">
+                    Certified Authentic
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-3 text-center backdrop-blur-md">
+                  <Truck className="h-4 w-4 text-[#8ef065]" />
+                  <span className="text-[10px] font-medium leading-tight text-zinc-400 sm:text-xs">
+                    Insured Delivery
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-3 text-center backdrop-blur-md">
+                  <Gem className="h-4 w-4 text-[#8ef065]" />
+                  <span className="text-[10px] font-medium leading-tight text-zinc-400 sm:text-xs">
+                    Gift Boxed
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Product Info */}
-          <div className="relative">
-            <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-b from-zinc-900 to-black p-8 shadow-[0_20px_80px_-20px_rgba(76,166,38,0.35)] backdrop-blur-xl">
-              <div className="mb-6 inline-flex items-center rounded-full border border-[#4ca626]/30 bg-[#4ca626]/10 px-4 py-2 text-sm font-semibold text-[#b7f19e] backdrop-blur-md">
+          <div className="animate-in fade-in slide-in-from-right-4 duration-700">
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-b from-zinc-900/80 to-black p-6 shadow-[0_30px_100px_-20px_rgba(76,166,38,0.35)] backdrop-blur-xl sm:p-8 lg:p-10">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#4ca626]/30 bg-[#4ca626]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#b7f19e] backdrop-blur-md">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#8ef065]" />
                 Premium Product
               </div>
 
-              <h1 className="text-4xl font-black leading-tight tracking-tight md:text-5xl">
+              <h1 className="text-3xl font-black leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-5xl">
                 {product.name}
               </h1>
 
               {/* Price Section */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                {appliedCoupon ? (
-                  <>
-                    <h2 className="text-4xl font-extrabold text-[#8ef065]">
-                      ₹{discountedPriceWithTax}
-                    </h2>
-                    <p className="text-xl text-zinc-500 line-through">
-                      ₹{standardPriceWithTax}
-                    </p>
-                    <div className="flex items-center gap-1 rounded-full bg-[#4ca626]/20 px-3 py-1.5 text-xs font-bold text-[#8ef065]">
-                      <span>Code: {appliedCoupon.code}</span>
-                      <button
-                        onClick={removeCoupon}
-                        className="ml-1 rounded-full p-0.5 hover:bg-white/10 transition-colors"
-                        title="Remove Coupon"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h2 className="text-4xl font-extrabold text-white">
-                      ₹{standardPriceWithTax}
-                    </h2>
-                    {productMrp && productMrp > standardPriceWithTax && (
-                      <p className="text-2xl text-zinc-500 line-through">
-                        ₹{productMrp.toFixed(0)}
+              <div className="mt-6 lg:mt-8">
+                <div className="flex flex-wrap items-baseline gap-3">
+                  {appliedCoupon ? (
+                    <>
+                      <h2 className="text-3xl font-extrabold text-[#8ef065] sm:text-4xl">
+                        ₹{discountedPriceWithTax}
+                      </h2>
+                      <p className="text-lg text-zinc-500 line-through sm:text-xl">
+                        ₹{standardPriceWithTax}
                       </p>
-                    )}
-                    {standardDiscountPercent && (
-                      <div className="rounded-full bg-[#4ca626]/15 px-4 py-2 text-sm font-bold text-[#8ef065]">
-                        {standardDiscountPercent}% OFF
+                      <div className="flex items-center gap-1 rounded-full bg-[#4ca626]/20 px-3 py-1.5 text-xs font-bold text-[#8ef065]">
+                        <span>Code: {appliedCoupon.code}</span>
+                        <button
+                          onClick={removeCoupon}
+                          className="ml-1 rounded-full p-0.5 transition-colors hover:bg-white/10"
+                          title="Remove Coupon"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
                       </div>
-                    )}
-                  </>
-                )}
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+                        ₹{standardPriceWithTax}
+                      </h2>
+                      {productMrp && productMrp > standardPriceWithTax && (
+                        <p className="text-lg text-zinc-500 line-through sm:text-xl">
+                          ₹{productMrp.toFixed(0)}
+                        </p>
+                      )}
+                      {standardDiscountPercent && (
+                        <div className="rounded-full bg-[#4ca626]/15 px-3 py-1.5 text-xs font-bold text-[#8ef065] sm:text-sm">
+                          {standardDiscountPercent}% OFF
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+                <p className="mt-1.5 text-xs text-zinc-500">
+                  Inclusive of all taxes
+                </p>
 
-                <div className="w-full mt-4">
+                <div className="mt-5">
                   <AvailableCoupons
                     coupons={availableCoupons}
                     loading={loadingCoupons}
@@ -384,46 +438,57 @@ export default function ProductDetailPage() {
               {/* Stock */}
               <div className="mt-6">
                 <span
-                  className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
                     product.stock > 10
                       ? "bg-[#4ca626]/15 text-[#9ef07a]"
                       : product.stock > 0
-                        ? "bg-yellow-500/15 text-green-400"
+                        ? "bg-amber-500/15 text-amber-300"
                         : "bg-red-500/15 text-red-300"
                   }`}
                 >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      product.stock > 10
+                        ? "bg-[#9ef07a]"
+                        : product.stock > 0
+                          ? "bg-amber-300"
+                          : "bg-red-300"
+                    }`}
+                  />
                   {product.stock > 10
-                    ? "● In Stock"
+                    ? "In Stock"
                     : product.stock > 0
-                      ? "● High Demand"
-                      : "● Out Of Stock"}
+                      ? "High Demand — Order Soon"
+                      : "Out Of Stock"}
                 </span>
+              </div>
+
+              {/* Add To Cart */}
+              <div className="mt-8 lg:mt-10">
+                <AddToCartForm
+                  productId={product.id}
+                  variants={product.variants ?? []}
+                  couponCode={appliedCoupon?.code || null}
+                  discountedPrice={discountedPriceWithTax}
+                />
               </div>
 
               <div className="my-8 h-px bg-gradient-to-r from-[#4ca626]/40 via-white/10 to-transparent" />
 
               {/* Description */}
               <div>
-                <h3 className="mb-4 text-lg font-bold text-white">
-                  Product Description
+                <h3 className="mb-3 text-lg font-bold text-white">
+                  The Details
                 </h3>
                 <p
-                  className="text-base leading-8 text-zinc-400"
+                  className="text-[15px] leading-7 text-zinc-400 sm:text-base sm:leading-8"
                   style={{ whiteSpace: "pre-wrap" }}
                 >
                   {product.description}
                 </p>
               </div>
 
-              {/* Add To Cart */}
-              <div className="mt-10">
-                <AddToCartForm
-                  productId={product.id}
-                  variants={product.variants ?? []}
-                  couponCode={appliedCoupon?.code || null}
-                  discountedPrice={discountedPriceWithTax} // Passes calculated price variable
-                />
-              </div>
+              
 
               <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-[#4ca626] via-[#7ae14d] to-transparent" />
             </div>
@@ -432,17 +497,17 @@ export default function ProductDetailPage() {
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div className="mt-24">
-            <div className="mb-10 flex items-center justify-between">
+          <div className="mt-20 lg:mt-28">
+            <div className="mb-8 flex items-center justify-between lg:mb-10">
               <div>
-                <h2 className="text-3xl font-black tracking-tight text-white">
+                <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
                   You May Also Like
                 </h2>
-                <p className="mt-2 text-zinc-400">
+                <p className="mt-1.5 text-sm text-zinc-400 sm:text-base">
                   Explore similar premium products
                 </p>
               </div>
-              <div className="hidden h-px flex-1 bg-gradient-to-r from-[#4ca626]/40 to-transparent lg:block" />
+              <div className="hidden h-px flex-1 bg-gradient-to-r from-[#4ca626]/40 to-transparent lg:ml-8 lg:block" />
             </div>
             <YouMayAlsoLike products={relatedProducts} />
           </div>
@@ -474,7 +539,7 @@ function AvailableCoupons({
 
   if (loading) {
     return (
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="flex gap-3 overflow-x-auto pb-1">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
@@ -488,12 +553,12 @@ function AvailableCoupons({
   if (coupons.length === 0) return null;
 
   return (
-    <div className="space-y-2">
-      <Label className="text-white text-sm font-medium flex items-center gap-1.5">
+    <div className="space-y-2.5">
+      <Label className="flex items-center gap-1.5 text-sm font-medium text-white">
         <Tag className="h-4 w-4 text-[#4ca626]" />
         Available Coupons
       </Label>
-      <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+      <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
         {coupons.map((coupon) => {
           const isApplied = appliedCode === coupon.code;
           return (
@@ -502,23 +567,23 @@ function AvailableCoupons({
               type="button"
               onClick={() => onSelect(coupon.code)}
               disabled={isApplied}
-              className={`flex-shrink-0 w-44 text-left rounded-xl border p-3 transition-colors ${
+              className={`w-44 flex-shrink-0 rounded-xl border p-3 text-left transition-colors ${
                 isApplied
-                  ? "border-[#4ca626] bg-[#4ca626]/10 cursor-default"
+                  ? "cursor-default border-[#4ca626] bg-[#4ca626]/10"
                   : "border-dashed border-[#4ca626]/40 bg-black/40 hover:border-[#4ca626] hover:bg-[#4ca626]/5"
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-mono text-sm font-semibold text-[#9be274] truncate">
+                <span className="truncate text-sm font-semibold text-[#9be274]">
                   {coupon.code}
                 </span>
                 {isApplied ? (
-                  <Check className="h-4 w-4 text-[#9be274] flex-shrink-0" />
+                  <Check className="h-4 w-4 flex-shrink-0 text-[#9be274]" />
                 ) : (
-                  <Copy className="h-3.5 w-3.5 text-zinc-500 flex-shrink-0" />
+                  <Copy className="h-3.5 w-3.5 flex-shrink-0 text-zinc-500" />
                 )}
               </div>
-              <div className="text-xs text-zinc-400 mt-1">
+              <div className="mt-1 text-xs text-zinc-400">
                 {formatDiscount(coupon)}
               </div>
             </button>
