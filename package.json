@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "commit": "git add . && git commit -a && git push -u origin main"
+    "commit": "git add . && git commit -m 'FIX' && git push -u origin main"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1086.0",

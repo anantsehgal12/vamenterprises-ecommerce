@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
-import SignIn from "@/app/_components/auth/signIn";
+import SignIn from "@/app/_components/auth/good";
 
 function SignInContent() {
   const searchParams = useSearchParams();
