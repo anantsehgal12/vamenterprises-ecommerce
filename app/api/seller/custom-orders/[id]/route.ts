@@ -28,15 +28,16 @@ async function requireSeller() {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const check = await requireSeller();
   if ("error" in check) return check.error;
 
   const [order] = await db
     .select()
     .from(CustomOrder)
-    .where(eq(CustomOrder.id, params.id))
+    .where(eq(CustomOrder.id, id))
     .limit(1);
 
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -49,8 +50,9 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const check = await requireSeller();
   if ("error" in check) return check.error;
 
@@ -69,7 +71,7 @@ export async function PATCH(
   const [updated] = await db
     .update(CustomOrder)
     .set(updates)
-    .where(eq(CustomOrder.id, params.id))
+    .where(eq(CustomOrder.id, id))
     .returning();
 
   if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -79,15 +81,16 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const check = await requireSeller();
   if ("error" in check) return check.error;
 
   const [existing] = await db
     .select()
     .from(CustomOrder)
-    .where(eq(CustomOrder.id, params.id))
+    .where(eq(CustomOrder.id, id))
     .limit(1);
 
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -99,6 +102,6 @@ export async function DELETE(
     );
   }
 
-  await db.delete(CustomOrder).where(eq(CustomOrder.id, params.id));
+  await db.delete(CustomOrder).where(eq(CustomOrder.id, id));
   return NextResponse.json({ success: true });
 }
