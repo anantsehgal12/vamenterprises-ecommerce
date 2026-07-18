@@ -15,9 +15,19 @@ import {
 
 import { relations } from "drizzle-orm";
 
-export const taxRateEnum = pgEnum("tax_rate_enum", ["0", "5", "12", "18", "20", "40"]);
+export const taxRateEnum = pgEnum("tax_rate_enum", [
+  "0",
+  "5",
+  "12",
+  "18",
+  "20",
+  "40",
+]);
 export const isOptionalEnum = pgEnum("is_optional_enum", ["Yes", "No"]);
-export const paymentMethodEnum = pgEnum("payment_method_enum", ["Razorpay", "COD"]);
+export const paymentMethodEnum = pgEnum("payment_method_enum", [
+  "Razorpay",
+  "COD",
+]);
 export const customOrderStatusEnum = pgEnum("custom_order_status_enum", [
   "pending",
   "claimed",
@@ -33,7 +43,6 @@ export type CustomOrderItem = {
   quantity: number;
   price: number; // snapshot price — lets the seller discount/adjust per link
 };
-
 
 /* =========================================================
    CATEGORY
@@ -245,9 +254,7 @@ export const Order = pgTable("Order", {
     scale: 2,
   }).notNull(),
 
-  status: varchar("status", { length: 50 })
-    .default("pending")
-    .notNull(),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
 
   paymentStatus: varchar("payment_status", {
     length: 50,
@@ -280,6 +287,19 @@ export const Order = pgTable("Order", {
   cancelDescription: text("cancel_description"),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  advanceAmount: decimal("advance_amount", {
+    precision: 10,
+    scale: 2,
+  }),
+
+  balanceAmount: decimal("balance_amount", {
+    precision: 10,
+    scale: 2,
+  }),
+
+  customOrderId: uuid("custom_order_id").references(() => CustomOrder.id, {
+    onDelete: "set null",
+  }),
 });
 
 export const OrderItem = pgTable("OrderItem", {
@@ -359,7 +379,7 @@ export const addresses = pgTable(
   },
   (t) => ({
     unqNamePerUser: unique().on(t.userId, t.name),
-  })
+  }),
 );
 
 /* =========================================================
@@ -409,8 +429,18 @@ export const Announcement = pgTable("Announcement", {
 
 export const StoreSettings = pgTable("StoreSettings", {
   id: uuid("id").defaultRandom().primaryKey(),
-  standardDeliveryFee: decimal("standard_delivery_fee", { precision: 10, scale: 2 }).default("50").notNull(),
-  freeDeliveryThreshold: decimal("free_delivery_threshold", { precision: 10, scale: 2 }).default("500").notNull(),
+  standardDeliveryFee: decimal("standard_delivery_fee", {
+    precision: 10,
+    scale: 2,
+  })
+    .default("50")
+    .notNull(),
+  freeDeliveryThreshold: decimal("free_delivery_threshold", {
+    precision: 10,
+    scale: 2,
+  })
+    .default("500")
+    .notNull(),
   freeDeliveryCoupon: boolean("free_delivery_coupon").default(true).notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
