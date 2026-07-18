@@ -1,3 +1,4 @@
+// app/_components/auth/signIn.tsx
 "use client";
 
 import { useState } from "react";
@@ -10,6 +11,8 @@ import Apple from "@/public/logos/apple.svg";
 import Link from "next/link";
 import Image from "next/image";
 
+// CHANGED: accept a redirectUrl prop — where to send the user after a
+// successful sign-in (falls back to "/" when not provided).
 interface SignInProps {
   redirectUrl?: string;
 }
@@ -23,6 +26,9 @@ export default function SignIn({ redirectUrl }: SignInProps) {
   const [errorMessage, setErrorMessage] = useState("");
 
   const loading = fetchStatus === "fetching";
+
+  // CHANGED: carry redirect_url through to the sign-up page so switching
+  // forms doesn't lose it.
   const signUpHref = redirectUrl
     ? `/auth/sign-up?redirect_url=${encodeURIComponent(redirectUrl)}`
     : "/auth/sign-up";
@@ -52,7 +58,8 @@ export default function SignIn({ redirectUrl }: SignInProps) {
             return;
           }
 
-          const url = decorateUrl("/");
+          // CHANGED: land on redirectUrl instead of always "/"
+          const url = decorateUrl(redirectUrl || "/");
           if (url.startsWith("http")) {
             window.location.href = url;
           } else {
@@ -78,6 +85,7 @@ export default function SignIn({ redirectUrl }: SignInProps) {
     const { error } = await signIn.sso({
       strategy,
       redirectCallbackUrl: "/auth/sso-callback",
+      // CHANGED: final destination after SSO completes
       redirectUrl: redirectUrl || "/",
     });
 
@@ -188,10 +196,8 @@ export default function SignIn({ redirectUrl }: SignInProps) {
 
         <p className="mt-6 text-center text-sm text-zinc-400">
           Don't have an account?
-          <Link
-            href={signUpHref}
-            className="ml-1 text-white hover:underline"
-          >
+          {/* CHANGED: forward redirect_url so it survives the switch to sign-up */}
+          <Link href={signUpHref} className="ml-1 text-white hover:underline">
             Sign Up
           </Link>
         </p>
