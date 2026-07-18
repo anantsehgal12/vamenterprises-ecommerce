@@ -40,5 +40,11 @@ export default async function CustomOrderPage({
     return <CustomOrderState variant="expired" />;
   }
 
-  return <CustomOrderCheckout order={order} token={params.token} />;
+  return   <CustomOrderCheckout
+    token={params.token}
+    order={{
+      ...order,
+      expiresAt: order.expiresAt?.toISOString() ?? null
+    }}
+  />;
 }
