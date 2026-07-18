@@ -16,15 +16,16 @@ import { sendCustomOrderEmail } from "@/lib/email";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { token: string } },
+  { params }: { params: Promise<{ token: string }> },
 ) {
+  const { token } = await params;
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const [order] = await db
     .select()
     .from(CustomOrder)
-    .where(eq(CustomOrder.token, params.token))
+    .where(eq(CustomOrder.token, token))
     .limit(1);
 
   if (!order) {
@@ -54,8 +55,9 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { token: string } },
+  { params }: { params: Promise<{ token: string }> },
 ) {
+  const { token } = await params;
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -86,7 +88,7 @@ export async function POST(
   const [customOrder] = await db
     .select()
     .from(CustomOrder)
-    .where(eq(CustomOrder.token, params.token))
+    .where(eq(CustomOrder.token, token))
     .limit(1);
 
   if (!customOrder) {
