@@ -54,7 +54,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (isLoaded && !user) {
-      router.push('/sign-in');
+      router.push('/auth/sign-in');
       return;
     }
 

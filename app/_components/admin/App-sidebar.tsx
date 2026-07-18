@@ -68,6 +68,16 @@ const items = [
     icon: ShoppingCart,
   },
   {
+    title: "Custom Cart",
+    url: "/seller-dashboard/custom-orders",
+    icon: ShoppingCart,
+  },
+  {
+    title: "Create Custom Cart",
+    url: "/seller-dashboard/custom-orders/new",
+    icon: CirclePlus,
+  },
+  {
     title: "Notifications",
     url: "/seller-dashboard/notifications",
     icon: Bell,

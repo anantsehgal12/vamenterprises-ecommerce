@@ -1,10 +1,14 @@
-// app/auth/sign-in/page.tsx
 "use client";
 
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import SignIn from "@/app/_components/auth/signIn";
 
-export default function Page() {
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect_url") || undefined;
+
   return (
     <main>
       <div className="relative flex min-h-screen overflow-hidden">
@@ -44,10 +48,19 @@ export default function Page() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <SignIn />
+            {/* CHANGED: pass redirectUrl through — see note at bottom of file */}
+            <SignIn redirectUrl={redirectUrl} />
           </motion.div>
         </div>
       </div>
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <SignInContent />
+    </Suspense>
   );
 }

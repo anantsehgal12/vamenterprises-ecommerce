@@ -209,8 +209,11 @@ export default function OrderCompletePage() {
     );
   }
 
-  if (!user || !order) {
+  if (!order) {
     return null; // Will redirect
+  }
+  if (!user){
+    router.push('/auth/sign-in');
   }
 
   return (

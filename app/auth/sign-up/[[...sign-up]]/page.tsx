@@ -1,9 +1,15 @@
-// app/auth/sign-in/page.tsx
+// app/auth/sign-up/page.tsx
 "use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import SignUp from "@/app/_components/auth/signUp";
 import { motion } from "motion/react";
 
-export default function Page() {
+function SignUpContent() {
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect_url") || undefined;
+
   return (
     <main>
       <div className="relative flex min-h-screen overflow-hidden">
@@ -19,7 +25,7 @@ export default function Page() {
             className="max-w-xl"
           >
             <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-zinc-300">
-              Welcome Back
+              Welcome
             </span>
 
             <h1 className="mt-6 text-5xl font-bold tracking-tight text-white">
@@ -43,10 +49,19 @@ export default function Page() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <SignUp />
+            {/* CHANGED: pass redirectUrl through */}
+            <SignUp redirectUrl={redirectUrl} />
           </motion.div>
         </div>
       </div>
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <SignUpContent />
+    </Suspense>
   );
 }

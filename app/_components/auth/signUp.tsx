@@ -1,3 +1,4 @@
+// app/_components/auth/signUp.tsx
 "use client";
 
 import { useState } from "react";
@@ -18,7 +19,13 @@ import {
 } from "@/components/ui/input-otp";
 import Image from "next/image";
 
-export default function CustomSignUp() {
+// CHANGED: accept a redirectUrl prop — where to send the user after a
+// successful sign-up (falls back to "/" when not provided).
+interface CustomSignUpProps {
+  redirectUrl?: string;
+}
+
+export default function CustomSignUp({ redirectUrl }: CustomSignUpProps) {
   const { signUp, errors, fetchStatus } = useSignUp();
   const router = useRouter();
 
@@ -30,6 +37,12 @@ export default function CustomSignUp() {
 
   // ✅ Local flag — prevents showing verify screen before form is submitted
   const [pendingVerification, setPendingVerification] = useState(false);
+
+  // CHANGED: carry redirect_url through to the sign-in page so switching
+  // forms doesn't lose it.
+  const signInHref = redirectUrl
+    ? `/auth/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`
+    : "/auth/sign-in";
 
   const signUpWithPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,7 +74,8 @@ export default function CustomSignUp() {
       await signUp.finalize({
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) return;
-          const url = decorateUrl("/");
+          // CHANGED: land on redirectUrl instead of always "/"
+          const url = decorateUrl(redirectUrl || "/");
           if (url.startsWith("http")) {
             window.location.href = url;
           } else {
@@ -82,7 +96,8 @@ export default function CustomSignUp() {
       strategy,
       // ✅ Correct param names per SignUpFutureSSOParams
       redirectUrl: "/auth/sso-callback",
-      redirectCallbackUrl: "/",
+      // CHANGED: final destination after SSO completes
+      redirectCallbackUrl: redirectUrl || "/",
     });
   };
 
@@ -288,10 +303,8 @@ export default function CustomSignUp() {
 
         <p className="mt-6 text-center text-sm text-zinc-400">
           Already have an account?
-          <Link
-            href="/auth/sign-in"
-            className="ml-1 text-white hover:underline"
-          >
+          {/* CHANGED: forward redirect_url so it survives the switch to sign-in */}
+          <Link href={signInHref} className="ml-1 text-white hover:underline">
             Sign In
           </Link>
         </p>

@@ -18,10 +18,71 @@ import { relations } from "drizzle-orm";
 export const taxRateEnum = pgEnum("tax_rate_enum", ["0", "5", "12", "18", "20", "40"]);
 export const isOptionalEnum = pgEnum("is_optional_enum", ["Yes", "No"]);
 export const paymentMethodEnum = pgEnum("payment_method_enum", ["Razorpay", "COD"]);
+export const customOrderStatusEnum = pgEnum("custom_order_status_enum", [
+  "pending",
+  "claimed",
+  "completed",
+  "cancelled",
+  "expired",
+]);
+
+export type CustomOrderItem = {
+  productId: string; // always a real Product.id, chosen by the seller
+  name: string; // snapshot of Product.name at the time the link was made
+  variant?: string;
+  quantity: number;
+  price: number; // snapshot price — lets the seller discount/adjust per link
+};
+
 
 /* =========================================================
    CATEGORY
 ========================================================= */
+
+export const CustomOrder = pgTable("CustomOrder", {
+  id: uuid("id").defaultRandom().primaryKey(),
+
+  token: varchar("token", { length: 64 }).notNull().unique(),
+
+  title: varchar("title", { length: 255 }).notNull(),
+
+  description: text("description"),
+
+  items: jsonb("items").$type<CustomOrderItem[]>().notNull().default([]),
+
+  subtotalAmount: decimal("subtotal_amount", { precision: 10, scale: 2 })
+    .default("0")
+    .notNull(),
+
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 })
+    .default("0")
+    .notNull(),
+
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 })
+    .default("0")
+    .notNull(),
+
+  status: customOrderStatusEnum("status").default("pending").notNull(),
+
+  createdBy: varchar("created_by", { length: 255 })
+    .notNull()
+    .references(() => User.clerkId, { onDelete: "set null" }),
+
+  customerId: varchar("customer_id", { length: 255 }).references(
+    () => User.clerkId,
+    { onDelete: "set null" },
+  ),
+
+  customerEmail: varchar("customer_email", { length: 255 }),
+
+  notes: text("notes"),
+
+  expiresAt: timestamp("expires_at"),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 export const Category = pgTable("Category", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -452,5 +513,16 @@ export const WishlistRelations = relations(Wishlist, ({ one }) => ({
   product: one(Product, {
     fields: [Wishlist.productId],
     references: [Product.id],
+  }),
+}));
+
+export const CustomOrderRelations = relations(CustomOrder, ({ one }) => ({
+  creator: one(User, {
+    fields: [CustomOrder.createdBy],
+    references: [User.clerkId],
+  }),
+  customer: one(User, {
+    fields: [CustomOrder.customerId],
+    references: [User.clerkId],
   }),
 }));
