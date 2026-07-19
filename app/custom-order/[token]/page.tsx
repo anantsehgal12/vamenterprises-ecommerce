@@ -6,6 +6,20 @@ import { CustomOrder } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
 import CustomOrderCheckout from "@/app/_components/custom-order/CustomOrderCheckout";
 import CustomOrderState from "@/app/_components/custom-order/CustomOrderState";
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: "Custom Order - VAM Enterprises",
+  description:
+    "Manage your products, view sales, and update your profile in the seller dashboard.",
+};
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+      {children}
+  );
+}
 
 export default async function CustomOrderPage({
   params,
