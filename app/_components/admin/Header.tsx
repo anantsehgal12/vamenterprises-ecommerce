@@ -25,6 +25,8 @@ export default function Header() {
     "/seller-dashboard/edit-product": "Edit Product",
     "/seller-dashboard/announcements": "Announcements",
     "/seller-dashboard/create-order": "Create Order [POS]",
+    "/seller-dashboard/custom-orders": "Custom Orders",
+    "/seller-dashboard/custom-orders/new": "Create Custom Order",
     // Add more paths and titles as needed
   };
 

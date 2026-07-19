@@ -1,11 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Show,
-  UserButton,
-  useUser,
-} from "@clerk/nextjs";
+import { Show, UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import {
   Building,
@@ -18,8 +14,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { useIsAdmin } from "@/app/extras/useIsAdmin";
 
-const display = 'font-[family-name:var(--font-display)]'
-const mono = 'font-[family-name:var(--font-mono)]'
+const display = "font-[family-name:var(--font-display)]";
+const mono = "font-[family-name:var(--font-mono)]";
 
 function Navbar() {
   const user = useUser();
@@ -34,14 +30,18 @@ function Navbar() {
 
   const fetchCartItemCount = async () => {
     try {
-      const response = await fetch('/api/cart');
+      const response = await fetch("/api/cart");
       if (response.ok) {
         const cart = await response.json();
-        const count = cart.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0;
+        const count =
+          cart.items?.reduce(
+            (sum: number, item: any) => sum + item.quantity,
+            0,
+          ) || 0;
         setCartItemCount(count);
       }
     } catch (error) {
-      console.error('Error fetching cart count:', error);
+      console.error("Error fetching cart count:", error);
     }
   };
 
@@ -59,28 +59,41 @@ function Navbar() {
               className="relative md:w-[64px] md:h-[64px]"
             />
           </div>
-          <h1 className={`${display} text-lg md:text-xl font-semibold text-white tracking-tight`}>
+          <h1
+            className={`${display} text-lg md:text-xl font-semibold text-white tracking-tight`}
+          >
             VAM Enterprises
           </h1>
         </Link>
 
         <div className="hidden md:block">
-          <ul className={`${mono} flex gap-8 md:gap-10 text-[12px] uppercase tracking-[0.15em] text-zinc-300`}>
+          <ul
+            className={`${mono} flex gap-8 md:gap-10 text-[12px] uppercase tracking-[0.15em] text-zinc-300`}
+          >
             <li>
-              <Link href="/shop" className="inline-flex items-center gap-2 transition-colors hover:text-[#9be274]">
+              <Link
+                href="/shop"
+                className="inline-flex items-center gap-2 transition-colors hover:text-[#9be274]"
+              >
                 <ShoppingBag className="h-4 w-4" />
                 Shop
               </Link>
             </li>
             <li>
-              <Link href="/about-us" className="inline-flex items-center gap-2 transition-colors hover:text-[#9be274]">
+              <Link
+                href="/about-us"
+                className="inline-flex items-center gap-2 transition-colors hover:text-[#9be274]"
+              >
                 <Building className="h-4 w-4" />
                 About Us
               </Link>
             </li>
             {useIsAdmin() && (
               <li>
-                <Link href="/seller-dashboard" className="inline-flex items-center gap-2 transition-colors hover:text-[#a996ff]">
+                <Link
+                  href="/seller-dashboard"
+                  className="inline-flex items-center gap-2 transition-colors hover:text-[#a996ff]"
+                >
                   <UserCog className="h-4 w-4" />
                   Seller Dashboard
                 </Link>
@@ -110,10 +123,10 @@ function Navbar() {
             <h1 className={`${mono} text-sm md:text-base text-zinc-300`}>
               Hi, {User?.firstName}
             </h1>
-            <UserButton>
+            <UserButton userProfileUrl="/account">
               <UserButton.MenuItems>
                 <UserButton.Action
-                  label={`Cart${cartItemCount > 0 ? ` (${cartItemCount})` : ''}`}
+                  label={`Cart${cartItemCount > 0 ? ` (${cartItemCount})` : ""}`}
                   labelIcon={<ShoppingCartIcon className="w-4 h-4" />}
                   onClick={() => (window.location.href = "/cart")}
                 />

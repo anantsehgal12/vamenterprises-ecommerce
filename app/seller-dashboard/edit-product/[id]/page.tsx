@@ -102,7 +102,7 @@ export default function EditProductPage() {
   const [isDragActive, setIsDragActive] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [taxRates, setTaxRates] = useState<any[]>(["0", "5", "12", "18", "20", "40"]);
+  const [taxRates, setTaxRates] = useState<any[]>(["0", "3", "5", "12", "18", "20", "40"]);
 
   useEffect(() => {
     fetchProduct();

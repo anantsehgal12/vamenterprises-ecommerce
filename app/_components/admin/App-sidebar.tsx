@@ -38,6 +38,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { NavUser } from "./nav-user";
 
 const logo = "https://i.ibb.co/6785v806/VAM-Enterprises-Logo.png";
 
@@ -289,7 +290,10 @@ export function AppSidebar() {
         {/* Standalone bottom links */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2">{bottomLinks.map(renderLink)}</SidebarMenu>
+            <SidebarMenu className="space-y-2">
+              {bottomLinks.map(renderLink)}
+              <NavUser />
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

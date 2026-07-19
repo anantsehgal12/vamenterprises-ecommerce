@@ -17,6 +17,7 @@ import { relations } from "drizzle-orm";
 
 export const taxRateEnum = pgEnum("tax_rate_enum", [
   "0",
+  "3",
   "5",
   "12",
   "18",
