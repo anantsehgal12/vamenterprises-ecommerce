@@ -1,7 +1,9 @@
 // app/api/custom-orders/[token]/verify/route.ts
 //
 // Called after the customer completes the Razorpay checkout popup.
-// Verifies the signature server-side, then marks the Order paid.
+// Verifies the signature server-side, then marks the Order paid and
+// finalizes the CustomOrder. This is the ONLY place a CustomOrder gets
+// marked "completed" — the claim route (POST) never finalizes it.
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
@@ -39,6 +41,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
+  // Idempotency: Razorpay's handler (or a webhook, or a flaky network retry)
+  // can call this more than once for the same payment. If we've already
+  // recorded this exact payment as paid, just return success again instead
+  // of re-running the writes below.
+  if (order.paymentStatus === "paid" && order.razorpayPaymentId === razorpay_payment_id) {
+    return NextResponse.json({ success: true, orderNumber: order.orderId });
+  }
+
   const isFullyPaid = order.paymentMethod === "Razorpay";
 
   await db
@@ -46,14 +56,18 @@ export async function POST(req: NextRequest) {
     .set({
       razorpayPaymentId: razorpay_payment_id,
       paymentStatus: isFullyPaid ? "paid" : "partially_paid",
-      status: "PENDING",
+      // Previously this was set to the string "PENDING", which just put the
+      // order right back in a pending-looking state immediately after a
+      // successful payment. "processing" reflects reality: payment is in,
+      // order is now queued for fulfillment.
+      status: "processing",
     })
     .where(eq(Order.id, orderId));
 
   if (order.customOrderId) {
     await db
       .update(CustomOrder)
-      .set({ status: "completed", updatedAt: new Date() })
+      .set({ status: "completed", customerId: userId, updatedAt: new Date() })
       .where(eq(CustomOrder.id, order.customOrderId));
   }
 

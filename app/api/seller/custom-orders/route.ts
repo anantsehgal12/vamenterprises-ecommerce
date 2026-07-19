@@ -48,7 +48,6 @@ async function requireSeller() {
       ),
     } as const;
   }
-console.log(userId);
 
   return {
     userId,
@@ -59,8 +58,6 @@ console.log(userId);
 export async function GET() {
   const check = await requireSeller();
   if ("error" in check) return check.error;
-
-console.log(check.role);
 
   const orders = await db
     .select()
@@ -122,14 +119,28 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // `item.price` is the pre-tax unit price the seller typed in (same
+  // convention as Product.price elsewhere in the app). We apply that
+  // product's taxRate here so the CustomOrder's stored totals — and what
+  // the customer is ultimately charged at checkout — are tax-inclusive,
+  // instead of silently dropping tax the way the previous version did.
   const itemsWithSnapshot = items.map(
-    (item: { productId: string; variant?: string; quantity: number; price: number }) => ({
-      productId: item.productId,
-      name: productMap.get(item.productId)!.name,
-      variant: item.variant || undefined,
-      quantity: Number(item.quantity),
-      price: Number(item.price),
-    }),
+    (item: { productId: string; variant?: string; quantity: number; price: number }) => {
+      const product = productMap.get(item.productId)!;
+      const basePrice = Number(item.price);
+      const taxRate = Number(product.taxRate);
+      const price = Number((basePrice * (1 + taxRate / 100)).toFixed(2));
+
+      return {
+        productId: item.productId,
+        name: product.name,
+        variant: item.variant || undefined,
+        quantity: Number(item.quantity),
+        price,
+        basePrice,
+        taxRate,
+      };
+    },
   );
 
   const subtotalAmount = itemsWithSnapshot.reduce(

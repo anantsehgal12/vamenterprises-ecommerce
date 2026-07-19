@@ -169,16 +169,16 @@ export default function CustomOrderCheckout({
 
   if (success) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-6">
+      <main className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4 sm:p-6">
         <div className="relative w-full max-w-md">
           <div className="absolute inset-0 rounded-3xl bg-[#4ca626]/10 blur-3xl" />
-          <div className="relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl p-10 text-center">
-            <div className="h-16 w-16 rounded-2xl bg-[#4ca626]/20 border border-[#4ca626]/30 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="h-8 w-8 text-[#7ddc56]" />
+          <div className="relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl p-6 sm:p-10 text-center">
+            <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-[#4ca626]/20 border border-[#4ca626]/30 flex items-center justify-center mx-auto mb-5 sm:mb-6">
+              <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8 text-[#7ddc56]" />
             </div>
-            <h1 className="text-2xl font-bold font-serif mb-2">Order confirmed</h1>
-            <p className="text-sm text-zinc-400 mb-1">Order #{success.orderNumber}</p>
-            <p className="text-sm text-zinc-400 leading-relaxed mb-8">
+            <h1 className="text-xl sm:text-2xl font-bold font-serif mb-2">Order confirmed</h1>
+            <p className="text-sm text-zinc-400 mb-1 break-words">Order #{success.orderNumber}</p>
+            <p className="text-sm text-zinc-400 leading-relaxed mb-8 break-words">
               We'll send updates to {email || "your email"}. Thank you for shopping with VAM Enterprises.
             </p>
             <Button
@@ -197,30 +197,38 @@ export default function CustomOrderCheckout({
     <main className="min-h-screen bg-[#0a0a0a] text-white pb-28 lg:pb-16">
       {/* Header */}
       <div className="border-b border-white/10 bg-black/30 backdrop-blur-xl">
-        <div className="mx-auto max-w-6xl px-6 py-8">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#4ca626]/30 bg-[#4ca626]/10 px-4 py-1.5 text-xs text-[#7ddc56]">
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
             Curated just for you
           </span>
-          <h1 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight font-serif">{order.title}</h1>
+          <h1 className="mt-4 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight font-serif break-words">
+            {order.title}
+          </h1>
           {order.description && (
-            <p className="mt-3 max-w-2xl text-zinc-400 leading-relaxed">{order.description}</p>
+            <p className="mt-3 max-w-2xl text-sm sm:text-base text-zinc-400 leading-relaxed break-words">
+              {order.description}
+            </p>
           )}
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mx-auto max-w-6xl px-6 py-10 grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-8">
+      <form
+        onSubmit={handleSubmit}
+        className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-6 sm:gap-8"
+      >
+
         <div className="space-y-8 order-2 xl:order-1">
           {/* Delivery details */}
-          <Card className="border-zinc-800 bg-gradient-to-b from-[#0b0d18] to-black rounded-3xl p-6 sm:p-7 shadow-[0_0_40px_rgba(34,197,94,0.05)]">
+          <Card className="border-zinc-800 bg-gradient-to-b from-[#0b0d18] to-black rounded-3xl p-4 sm:p-6 lg:p-7 shadow-[0_0_40px_rgba(34,197,94,0.05)]">
             <div className="mb-6 flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-lime-500" />
+              <MapPin className="h-5 w-5 text-lime-500 shrink-0" />
               <div>
-                <h2 className="font-mono text-xl font-semibold text-white">Delivery Details</h2>
+                <h2 className="font-mono text-lg sm:text-xl font-semibold text-white">Delivery Details</h2>
                 <p className="text-xs text-zinc-500 mt-1">Where should we send your order?</p>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-5">
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
                 <Label className="mb-2 block text-zinc-300">Full Name *</Label>
                 <Input
@@ -313,7 +321,7 @@ export default function CustomOrderCheckout({
           <Button
             type="submit"
             disabled={submitting}
-            className="hidden xl:flex w-full h-14 rounded-2xl bg-[#4ca626] hover:bg-[#5bbd31] text-white font-semibold text-base shadow-[0_0_40px_rgba(76,166,38,0.35)] disabled:opacity-50"
+            className="hidden xl:flex w-full h-14 rounded-2xl bg-[#4ca626] hover:bg-[#5bbd31] text-white font-semibold text-sm sm:text-base shadow-[0_0_40px_rgba(76,166,38,0.35)] disabled:opacity-50 px-4 text-center"
           >
             {submitting ? "Processing..." : `Confirm & Pay ₹${advanceAmount.toLocaleString("en-IN")}`}
           </Button>
@@ -321,19 +329,19 @@ export default function CustomOrderCheckout({
 
         {/* Order summary */}
         <div className="order-1 xl:order-2 space-y-6 xl:sticky xl:top-10 h-fit">
-          <Card className="border-zinc-800 bg-gradient-to-b from-[#0b0d18] to-black rounded-3xl p-6 shadow-[0_0_40px_rgba(34,197,94,0.05)]">
-            <h3 className="font-mono text-xl font-semibold text-white mb-6">Your Order</h3>
+          <Card className="border-zinc-800 bg-gradient-to-b from-[#0b0d18] to-black rounded-3xl p-4 sm:p-6 shadow-[0_0_40px_rgba(34,197,94,0.05)]">
+            <h3 className="font-mono text-lg sm:text-xl font-semibold text-white mb-6">Your Order</h3>
             <div className="space-y-4">
               {order.items.map((item, i) => (
-                <div key={i} className="flex justify-between items-start text-sm">
-                  <div className="flex-1 pr-4">
-                    <p className="font-medium text-white">{item.name}</p>
+                <div key={i} className="flex justify-between items-start text-sm gap-3">
+                  <div className="flex-1 min-w-0 pr-2">
+                    <p className="font-medium text-white break-words">{item.name}</p>
                     <p className="text-zinc-500">
                       {item.quantity} x ₹{item.price.toLocaleString("en-IN")}
                     </p>
-                    {item.variant && <p className="text-xs text-zinc-500">Variant: {item.variant}</p>}
+                    {item.variant && <p className="text-xs text-zinc-500 break-words">Variant: {item.variant}</p>}
                   </div>
-                  <span className="font-medium text-white whitespace-nowrap">
+                  <span className="font-medium text-white whitespace-nowrap shrink-0">
                     ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                   </span>
                 </div>
@@ -366,11 +374,14 @@ export default function CustomOrderCheckout({
       </form>
 
       {/* Sticky mobile submit bar */}
-      <div className="fixed bottom-0 inset-x-0 z-40 xl:hidden border-t border-white/10 bg-black/70 backdrop-blur-xl p-4">
+      <div
+        className="fixed bottom-0 inset-x-0 z-40 xl:hidden border-t border-white/10 bg-black/70 backdrop-blur-xl p-4"
+        style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+      >
         <Button
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full h-14 rounded-2xl bg-[#4ca626] hover:bg-[#5bbd31] text-white font-semibold text-base shadow-[0_0_40px_rgba(76,166,38,0.35)] disabled:opacity-50"
+          className="w-full h-14 rounded-2xl bg-[#4ca626] hover:bg-[#5bbd31] text-white font-semibold text-sm sm:text-base shadow-[0_0_40px_rgba(76,166,38,0.35)] disabled:opacity-50 px-4 text-center"
         >
           {submitting ? "Processing..." : `Confirm & Pay ₹${advanceAmount.toLocaleString("en-IN")}`}
         </Button>

@@ -28,16 +28,16 @@ export default async function CustomOrderPage({
     .limit(1);
 
   if (!order) {
-    return <CustomOrderState variant="invalid" />;
+    return <CustomOrderState variant="INVALID" />;
   }
   if (order.status === "completed" || order.status === "claimed") {
-    return <CustomOrderState variant="completed" />;
+    return <CustomOrderState variant="COMPLETED" />;
   }
   if (order.status === "cancelled") {
-    return <CustomOrderState variant="cancelled" />;
+    return <CustomOrderState variant="CANCELLED" />;
   }
   if (order.expiresAt && new Date(order.expiresAt) < new Date()) {
-    return <CustomOrderState variant="expired" />;
+    return <CustomOrderState variant="EXPIRED" />;
   }
 
   return   <CustomOrderCheckout

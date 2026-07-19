@@ -112,12 +112,29 @@ export default function NewCustomOrderPage() {
     setItems(newItems);
   };
 
+  // `item.price` is always the pre-tax unit price (auto-filled from
+  // Product.price, or overridden by the seller) — same convention the
+  // backend uses. Tax is layered on top here purely for display, so what
+  // the seller previews matches what the customer will actually be charged;
+  // the raw pre-tax price is still what gets submitted to the API.
+  const getTaxRate = (item: ItemRow) => {
+    const product = products.find((p) => p.id === item.productId);
+    return Number(product?.taxRate) || 0;
+  };
+
   const subtotal = items.reduce((total, item) => {
     const price = parseFloat(item.price) || 0;
     const quantity = parseInt(item.quantity) || 0;
     return total + price * quantity;
   }, 0);
-  const total = Math.max(subtotal - (parseFloat(discountAmount) || 0), 0);
+  const taxAmount = items.reduce((sum, item) => {
+    const price = parseFloat(item.price) || 0;
+    const quantity = parseInt(item.quantity) || 0;
+    const taxRate = getTaxRate(item);
+    return sum + price * quantity * (taxRate / 100);
+  }, 0);
+  const taxInclusiveSubtotal = subtotal + taxAmount;
+  const total = Math.max(taxInclusiveSubtotal - (parseFloat(discountAmount) || 0), 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -599,8 +616,9 @@ export default function NewCustomOrderPage() {
                                   className="h-12 rounded-xl bg-[#111111] border-white/10"
                                 />
                                 <p className="text-[11px] text-zinc-500 mt-1">
-                                  Auto-filled from catalog — override to give a
-                                  custom price for this link.
+                                  Pre-tax price, auto-filled from catalog —
+                                  override for a custom price. Tax is added
+                                  automatically in the total below.
                                 </p>
                               </div>
                             </div>
@@ -638,6 +656,8 @@ export default function NewCustomOrderPage() {
                       if (!product) return null;
                       const price = parseFloat(item.price) || 0;
                       const quantity = parseInt(item.quantity) || 0;
+                      const taxRate = getTaxRate(item);
+                      const lineTotal = price * quantity * (1 + taxRate / 100);
                       return (
                         <div
                           key={index}
@@ -657,6 +677,7 @@ export default function NewCustomOrderPage() {
                               </p>
                               <p className="text-zinc-500">
                                 {quantity} x ₹{price.toFixed(2)}
+                                {taxRate > 0 && ` + ${taxRate}% tax`}
                               </p>
                               {item.variant && (
                                 <p className="text-xs text-zinc-500">
@@ -666,15 +687,19 @@ export default function NewCustomOrderPage() {
                             </div>
                           </div>
                           <span className="font-medium whitespace-nowrap">
-                            ₹{(price * quantity).toFixed(2)}
+                            ₹{lineTotal.toFixed(2)}
                           </span>
                         </div>
                       );
                     })}
                     <div className="h-px bg-white/10 my-4" />
                     <div className="flex justify-between items-center text-sm text-zinc-400">
-                      <span>Subtotal</span>
+                      <span>Subtotal (pre-tax)</span>
                       <span>₹{subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-zinc-400">
+                      <span>Tax</span>
+                      <span>₹{taxAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between gap-3">
                       <Label className="text-sm text-zinc-400 shrink-0">
@@ -694,6 +719,9 @@ export default function NewCustomOrderPage() {
                       <span>Total Amount</span>
                       <span>₹{total.toFixed(2)}</span>
                     </div>
+                    <p className="text-[11px] text-zinc-500 pt-1">
+                      This is what the customer will be charged, tax included.
+                    </p>
                   </div>
                 </Card>
               </div>

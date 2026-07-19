@@ -41,7 +41,9 @@ export type CustomOrderItem = {
   name: string; // snapshot of Product.name at the time the link was made
   variant?: string;
   quantity: number;
-  price: number; // snapshot price — lets the seller discount/adjust per link
+  price: number; // tax-INCLUSIVE unit price actually charged — basePrice * (1 + taxRate/100)
+  basePrice: number; // pre-tax unit price the seller entered, kept for auditing
+  taxRate: number; // Product.taxRate snapshotted at link-creation time
 };
 
 /* =========================================================
