@@ -12,3 +12,4 @@ declare module "color-thief-ts" {
     ): Promise<[number, number, number][]>;
   }
 }
+

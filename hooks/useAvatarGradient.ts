@@ -17,12 +17,13 @@ export function useAvatarGradient(imageUrl?: string) {
     img.crossOrigin = 'anonymous'
     img.src = imageUrl
 
-    img.onload = () => {
+    img.onload = async () => {
       if (cancelled) return
 
       try {
-        const colorThief = new ColorThief()
-        const [r, g, b] = colorThief.getColor(img)
+const colorThief = new ColorThief();
+
+const [r, g, b] = await colorThief.getColor(img);
 
         const c1 = `rgba(${r}, ${g}, ${b}, 0.35)`
         const c2 = `rgba(${Math.max(r - 40, 0)}, ${Math.max(
