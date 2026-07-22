@@ -22,6 +22,7 @@ import { useIsAdmin } from "@/app/extras/useIsAdmin";
 import { notFound } from "next/navigation";
 import Navbar from "@/app/_components/home/Navbar";
 import RefreshButton from "@/app/_components/admin/RefreshApis";
+import toast from "react-hot-toast";
 
 interface OrderItem {
   id: string;
@@ -152,6 +153,23 @@ export default function SellerOrdersPage() {
         )
       );
     });
+    const handleCopyOrderLink = (orderId: string) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const link = `${origin}/orders/${orderId}`;
+    navigator.clipboard.writeText(link);
+    toast.success("Order link copied!", {
+      style: { borderRadius: "10px", background: "#333", color: "#fff" },
+    });
+  };
+
+  const handleWhatsAppShareOrder = (order: Order) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const link = `${origin}/orders/${order.id}`;
+    const text = encodeURIComponent(
+      `Hi! Here are your order & tracking details for Order #${order.orderId} from VAM Enterprises: ${link}`
+    );
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
 
   if (!isLoaded || !isSignedIn) {
     return (

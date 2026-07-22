@@ -5,20 +5,13 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter, useParams } from "next/navigation";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
 import { AppSidebar } from "@/app/_components/admin/App-sidebar";
 import Header from "@/app/_components/admin/Header";
-
 import { Button } from "@/components/ui/button";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { Badge } from "@/components/ui/badge";
-
 import { Input } from "@/components/ui/input";
-
 import { Label } from "@/components/ui/label";
-
 import {
   Select,
   SelectContent,
@@ -26,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { useIsAdmin } from "@/app/extras/useIsAdmin";
 
 import {
@@ -36,25 +28,15 @@ import {
   ArrowLeft,
   ShoppingBag,
   Download,
-  Package,
-  MapPin,
   Truck,
+  Copy,
+  MessageCircle,
 } from "lucide-react";
 
 import { toast } from "react-hot-toast";
-import { createClient } from "@supabase/supabase-js";
 import JsBarcode from "jsbarcode";
-import { addresses } from "@/src/db/schema";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import ShiprocketTrackingDisplay from "@/app/_components/admin/ShiprocketTrackingDisplay";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { uploadInvoiceFile } from "@/lib/uploadImage";
 
 interface OrderItem {
   id: string;
@@ -223,19 +205,24 @@ const sanitizeOrder = (data: any): Order => {
 };
 
 export default function SellerOrderDetailsPage() {
-  const { isLoaded, isSignedIn, user } = useUser();
-
+    const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
-
   const params = useParams();
+  const isAdmin = useIsAdmin();
 
   const [order, setOrder] = useState<Order | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [uploading, setUploading] = useState(false);
-
   const [awbInput, setAwbInput] = useState("");
+
+  const handleWhatsAppShare = () => {
+    if (!order) return;
+    const link = getOrderShareUrl();
+    const text = encodeURIComponent(
+      `Hi ${order.fullName || "there"}! Here are your order & tracking details for Order #${order.orderId} from VAM Enterprises: ${link}`
+    );
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -270,6 +257,21 @@ export default function SellerOrderDetailsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+
+  // Helper functions for sharing order page
+  const getOrderShareUrl = () => {
+    if (typeof window === "undefined" || !order) return "";
+    return `${window.location.origin}/orders/${order.id}`;
+  };
+
+  const handleCopyLink = () => {
+    const link = getOrderShareUrl();
+    navigator.clipboard.writeText(link);
+    toast.success("Order link copied!", {
+      style: { borderRadius: "10px", background: "#333", color: "#fff" },
+    });
   };
 
   const updateOrderStatus = async (newStatus: string) => {
@@ -366,35 +368,20 @@ export default function SellerOrderDetailsPage() {
     setUploading(true);
 
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `invoice-${order.id}-${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("invoices")
-        .upload(fileName, file, {
-          contentType: file.type,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from("invoices")
-        .getPublicUrl(fileName);
+      const { url: invoiceUrl } = await uploadInvoiceFile(file);
 
       const response = await fetch(`/api/orders/${order.id}/invoice`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ invoiceUrl: publicUrlData.publicUrl }),
+        body: JSON.stringify({ invoiceUrl }),
       });
 
       if (response.ok) {
         setOrder({
           ...order,
-          invoiceUrl: publicUrlData.publicUrl,
+          invoiceUrl,
         });
 
         toast.success("Invoice uploaded successfully!", {
@@ -785,7 +772,7 @@ export default function SellerOrderDetailsPage() {
     };
   };
 
-  if (!useIsAdmin()) {
+  if (!isAdmin) {
     return null;
   }
 
@@ -825,19 +812,16 @@ export default function SellerOrderDetailsPage() {
   }
 
   return (
-    <SidebarProvider defaultOpen={false}>
+<SidebarProvider defaultOpen={false}>
       <AppSidebar />
-
       <SidebarInset>
         <main className="w-full min-h-screen bg-[#0a0a0a] text-white">
           <Header />
 
           <div className="container mx-10 p-6">
             {/* HERO */}
-
             <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#111111] p-8 mb-8">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#4ca62620,transparent_35%)]" />
-
               <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#4ca626]/10 blur-3xl rounded-full" />
 
               <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
@@ -872,7 +856,7 @@ export default function SellerOrderDetailsPage() {
                     ₹{Number(order.totalAmount).toFixed(2)}
                   </h2>
 
-                  <div className="mt-5 flex gap-3">
+                  <div className="mt-5 flex flex-wrap gap-3 items-center">
                     <Select
                       value={order.status}
                       onValueChange={updateOrderStatus}
@@ -883,30 +867,43 @@ export default function SellerOrderDetailsPage() {
 
                       <SelectContent>
                         <SelectItem value="PENDING">Pending</SelectItem>
-
                         <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-
                         <SelectItem value="SHIPPED">Shipped</SelectItem>
-
                         <SelectItem value="DELIVERED">Delivered</SelectItem>
-
                         <SelectItem value="CANCELLED">Cancelled</SelectItem>
                       </SelectContent>
                     </Select>
 
+                    {/* SHARE BUTTONS WITH EXACT STYLING */}
+                    <Button
+                      onClick={handleCopyLink}
+                      className="h-12 px-5 rounded-2xl bg-[#4ca626] hover:bg-[#5bbd31] text-white font-semibold"
+                    >
+                      <Copy className="h-4 w-4 mr-2" /> Copy Link
+                    </Button>
+
+                    <Button
+                      onClick={handleWhatsAppShare}
+                      variant="outline"
+                      className="h-12 px-5 rounded-2xl border-white/10 bg-[#181818] text-white hover:bg-white/5"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2 text-[#7ddc56]" /> Share on WhatsApp
+                    </Button>
+
                     <Button
                       onClick={() => router.push("/seller-dashboard/orders")}
                       variant="outline"
-                      className=" rounded-2xl bg-[#181818] border-white/10"
+                      className="h-12 rounded-2xl bg-[#181818] border-white/10"
                     >
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Back
                     </Button>
                   </div>
+
                   <section className="mt-4 w-full flex items-center justify-end">
                     <Button
                       onClick={downloadShippingLabel}
-                      className="bg-[#4ca626] hover:bg-[#5bbd31] py-3"
+                      className="bg-[#4ca626] hover:bg-[#5bbd31] py-3 rounded-2xl"
                     >
                       <Truck className="w-4 h-4 mr-2" />
                       Print Shipping Label

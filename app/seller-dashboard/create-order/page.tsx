@@ -20,9 +20,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 import { useIsAdmin } from "@/app/extras/useIsAdmin";
-import { CirclePlus, Plus, Trash2 } from "lucide-react";
+import { CirclePlus, Plus, Trash2, Check, ChevronsUpDown } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { createClient } from "@supabase/supabase-js";
 
@@ -51,6 +64,7 @@ interface CustomerDetails {
 export default function CreateOrderPage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
+  const isAdmin = useIsAdmin();
 
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -76,6 +90,7 @@ export default function CreateOrderPage() {
   const [items, setItems] = useState<OrderItem[]>([
     { productId: "", variant: "", quantity: "1", price: "0" },
   ]);
+  const [openProductIndex, setOpenProductIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/products")
@@ -88,7 +103,7 @@ export default function CreateOrderPage() {
     return null;
   }
 
-  if (!useIsAdmin()) {
+  if (!isAdmin) {
     notFound();
   }
 
@@ -346,14 +361,55 @@ export default function CreateOrderPage() {
                           )}
                           <div className="md:col-span-2">
                             <Label className="mb-2 block text-zinc-300">Product</Label>
-                            <Select value={item.productId} onValueChange={(val) => updateItem(index, "productId", val)}>
-                              <SelectTrigger className="h-12 rounded-xl bg-[#111111] border-white/10 w-full"><SelectValue placeholder="Select Product" /></SelectTrigger>
-                              <SelectContent>
-                                {products.map((p) => (
-                                  <SelectItem key={p.id} value={p.id}>{p.name} (₹{p.price.replace(/[^\d.]/g, "")})</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Popover open={openProductIndex === index} onOpenChange={(open) => setOpenProductIndex(open ? index : null)}>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={openProductIndex === index}
+                                  className="h-12 rounded-xl bg-[#111111] border-white/10 w-full justify-between font-normal text-white hover:bg-[#181818] hover:text-white"
+                                >
+                                  <span className="truncate">
+                                    {selectedProduct
+                                      ? `${selectedProduct.name} (₹${selectedProduct.price.replace(/[^\d.]/g, "")})`
+                                      : "Select Product"}
+                                  </span>
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                align="start"
+                                className="w-[--radix-popover-trigger-width] p-0 bg-[#111111] border-white/10 rounded-xl"
+                              >
+                                <Command className="bg-[#111111]">
+                                  <CommandInput placeholder="Search products..." className="h-11" />
+                                  <CommandList>
+                                    <CommandEmpty>No product found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {products.map((p) => (
+                                        <CommandItem
+                                          key={p.id}
+                                          value={p.name}
+                                          onSelect={() => {
+                                            updateItem(index, "productId", p.id);
+                                            setOpenProductIndex(null);
+                                          }}
+                                          className="cursor-pointer aria-selected:bg-[#4ca626]/20 aria-selected:text-white"
+                                        >
+                                          <Check
+                                            className={`mr-2 h-4 w-4 ${
+                                              item.productId === p.id ? "opacity-100 text-[#7ddc56]" : "opacity-0"
+                                            }`}
+                                          />
+                                          {p.name} (₹{p.price.replace(/[^\d.]/g, "")})
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
                           </div>
                           
                           {selectedProduct?.variants && selectedProduct.variants.some((v: any) => v.name) ? (

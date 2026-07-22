@@ -43,7 +43,7 @@ const ShiprocketTrackingDisplay: React.FC<ShiprocketTrackingDisplayProps> = ({ a
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/shiprocket-tracking?awb=${awb}`);
+      const response = await fetch(`/api/shiprocket-tracking?awb=${encodeURIComponent(awb)}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch tracking data');
@@ -109,7 +109,7 @@ const ShiprocketTrackingDisplay: React.FC<ShiprocketTrackingDisplayProps> = ({ a
           <p className="text-xs text-zinc-500">AWB: {awb}</p>
         </div>
         <a
-          href={track_url || `<https://shiprocket.co/tracking/${awb}>`}
+          href={track_url || `https://shiprocket.co/tracking/${awb}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
@@ -120,7 +120,7 @@ const ShiprocketTrackingDisplay: React.FC<ShiprocketTrackingDisplayProps> = ({ a
       </div>
 
       <div className="relative pl-6">
-        {shipment_track_activities.map((activity, index) => (
+        {(shipment_track_activities || []).map((activity, index) => (
           <div key={index} className="relative pb-6 last:pb-0">
             {index !== shipment_track_activities.length - 1 && (
               <div className="absolute left-[3px] top-1 h-full w-0.5 bg-zinc-700"></div>
